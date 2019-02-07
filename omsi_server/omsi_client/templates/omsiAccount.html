@@ -1,0 +1,49 @@
+{% extends "omsi_client/templates/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+</style>
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+
+<body>
+<div class="container">
+<div>
+    <!--<div class="span12" >-->
+<h3>Register for a new account</h3><p>Please notify by email an OpenMSI team member (bpbowen@lbl.gov) after completing the NERSC new account request below.</p>
+    <p>In the email, include the purpose for your account.  Please include information about what you are planning to do and the expected outcome.  Make sure to include this information and the contact person as Ben Bowen in the text-box below.</p>
+    <p>The interface below will create a NERSC account for you, and a second step is required by an OpenMSI team member to link your NERSC account with the OpenMSI project.</p>
+    <p>Contact an OpenMSI team member for any questions.</p>
+    <p>Also, to check on your new NERSC account, call account Support at 1-800-666-3772 menu 2, or 510-486-8612, to obtain a temporary password. You can call at any time, 24 x 7, and somebody will be here to assist you.</p>
+    <p>Select Account type = "standard".</p>
+<!--</div>-->
+<!--</div>-->
+    </div>
+</div>
+    <iframe height="1025" width="100%" src="https://nim.nersc.gov/nersc_account_request.php" ></iframe>
+
+<!--</div>-->
+
+</body>
+
+{% endblock %}

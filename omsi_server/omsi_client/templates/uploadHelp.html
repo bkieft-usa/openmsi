@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style type="text/css">
+
+
+
+</style>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-39099473-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- OpenMSI (2).png: looks fine to me, we just need to add the individual content. If we want we could optionally add a "What is OpenMSI" section to the bottom of this page in which we could elaborate in more detail on the vision of OpenMSI (think of something along the lines of a press release). This would allow us to keep the main page very compact and link to this page for more details. I would call this page the About page in the menu. -->
+
+<div class="container" >
+    <h1 style="text-align:center;">Upload files to OpenMSI</h1>
+    <hr>
+</div>
+
+<div class="container">
+    <div class = "row-fluid">
+    	<div class = "span12" style="text-align:left;">
+           <strong>OpenMSI account:</strong>
+            <ul>
+            <li>Get an OpenMSI account through the OpenMSI team and NERSC.  OpenMSI accounts are managed by NERSC and are required to upload data and view private data.</li>
+            </ul>
+
+            <strong>Setup Globus Connect for fast uploads:</strong>
+            <ul>
+            <li>Setup Globus Connect on the computer you'll be transferring data from.  To do this, you will need to get a Globus account and install Globus connect.
+                Your Globus connect installation will be associated with this account, and you will need it for a one-time linking of your OpenMSI credentials with your Globus credentials.</li>
+                </li>
+                <li>Please contact someone from Globus support or the OpenMSI team if you have trouble setting everything up.  The Globus tech-support group has been very effective in the past.</li>
+
+                </ul>
+            <strong>Open the File Transfer page:</strong>
+            <ul>
+            <li>In the navbar above, click on the "Files" tab and "Upload File".</li>
+            <li>On the right-hand side, a connection to NERSC's data transfer nodes should appear.</li>
+            <li>The Path on the right hand side should be /project/projectdirs/openmsi/original_data/"your username"</li>
+            <li>Select the endpoint on the left.  Type in the name you specified during the installation of Globus Connect.  Use something memorable (ie: "AbSciex5800_Potter_St")</li>
+            <li>Double check that the endpoint on the right is: nersc#dtn</li>
+            <li>Double check that the path on the right is: /project/projectdirs/openmsi/original_data/"your username"</li>
+
+            </ul>
+            <strong>Transfer your file:</strong>
+            <ul>
+            <li><strong>Each dataset must be contained inside a single sub-folder.</strong></li>
+                <ul>
+            <li>If you have an img file:</li>
+                <ul>
+                    <li>/project/projectdirs/openmsi/original_data/"your username"/"my_experiment"/"filename.img"</li>
+                    <li>/project/projectdirs/openmsi/original_data/"your username"/"my_experiment"/"filename.t2m"</li>
+                    <li>/project/projectdirs/openmsi/original_data/"your username"/"my_experiment"/"filename.hdr"</li>
+                </ul>
+            <li>If you have an mzML file:</li>
+                <ul>
+                    <li>/project/projectdirs/openmsi/original_data/"your username"/"my_experiment"/"filename.mzML"</li>
+                </ul>
+            <li>If you have an imzML file:</li>
+                <ul>
+                    <li>/project/projectdirs/openmsi/original_data/"your username"/"my_experiment"/"filename.imzML"</li>
+                    <li>/project/projectdirs/openmsi/original_data/"your username"/"my_experiment"/"filename.ibd"</li>
+                    <li>Note that we do not support all the features of imzML at this point, if your data is in this format please contact the OpenMSI team.</li>
+                </ul>
+            <li>If you have a dataset in the vendor's original format:</li>
+                <ul>
+                    <li>Convert is using msconvert to mzML.</li>
+                    <li>msconvert "original file" --mzML</li>
+                    <li>If your vendor's format isn't supported by msconvert please let us know.  We will make a note here for other users.</li>
+                </ul>
+                    </ul>
+            <li>On the left hand side, navigate to your file and click the right facing blue arrow to start the transfer</li>
+            <li>You will get an email from Globus when the file transfer finishes.</li>
+            </ul>
+            <strong>Import a file once upload completes:</strong>
+            <ul>
+            <li>In the navbar above, click on the "Files" tab and "Import File".</li>
+            <li>Select your file on the left</li>
+            <li>Supply the description of the sample, acquisition, and relevant notes.  Please take the time to supply this information now.</li>
+            <li>Submit your request to NERSC to import and convert your file into the OpenMSI format.</li>
+            <li>You should get an email once the file is imported.  Also, it will appear in the "Files/My Files" tab.</li>
+            </ul>
+
+        </div>
+    </div>
+</div>
+<br>
+
+<!--<div class="container" >-->
+    <!--<h1 style="text-align:center;">How to:</h1>-->
+    <!--<hr>-->
+<!--</div>-->
+<!--<div class="container">-->
+    <!--<div class = "row-fluid">-->
+    	<!--<div class = "span4" style="text-align:left;">-->
+            <!--Setting up Globus connect and endpoints for file transfer-->
+        <!--</div>-->
+
+    	<!--<div class = "span4" style="text-align:left;">-->
+            <!--Upload a Bruker "flex" series file-->
+        <!--</div>-->
+
+    	<!--<div class = "span4" style="text-align:left;">-->
+            <!--Upload an AbSciex "img" file-->
+        <!--</div>-->
+    <!--</div>-->
+
+    <!--<div class = "row-fluid">-->
+    	<!--<div class = "span4" style="text-align:left;">-->
+           <!--Upload a Thermo-Fischer "raw" file-->
+        <!--</div>-->
+    	<!--<div class = "span4" style="text-align:left;">-->
+           <!--What to do after your file is uploaded-->
+        <!--</div>-->
+    	<!--<div class = "span4" style="text-align:left;">-->
+            <!--How to launch your file-->
+        <!--</div>-->
+    <!--</div>-->
+
+    <!--<div class = "row-fluid">-->
+    	<!--<div class = "span4" style="text-align:left;">-->
+            <!--&lt;!&ndash;<iframe title="YouTube video player" class="youtube-player" type="text/html"&ndash;&gt;-->
+<!--&lt;!&ndash;width="100%" src="http://www.youtube.com/embed/W-Q7RMpINVo"&ndash;&gt;-->
+<!--&lt;!&ndash;frameborder="0" allowFullScreen></iframe>&ndash;&gt;-->
+            <!--How to change the sharing permissions for your file-->
+
+        <!--</div>-->
+        <!--<div class = "span4" style="text-align:left;">-->
+             <!--&lt;!&ndash;<a href="http://www.youtube.com/watch?v=69GIg2Ca_lk" target="_blank"><img src="{{ STATIC_URL }}images/news/bowen_science_theather_Oct2013.png" style="float:left;margin:5px 5px 5px 5px;" width="100%" ></a>&ndash;&gt;-->
+            <!--&lt;!&ndash;<h3>October 28, 2013: Coming to a hospital near you: mass spectrometry imaging</h3>&ndash;&gt;-->
+            <!--&lt;!&ndash;<p>Benjamin Bowen presents OpenMSI at the "Science at Theater: Eight Big Ideas" event. Eight Berkeley Lab scientists presented eight game-changing concepts in eight minutes each, a the Berkeley Repertory Theater. [<a href=http://www.youtube.com/watch?v=69GIg2Ca_lk target="_blank">Watch the video on YouTube</a>]&ndash;&gt;-->
+        <!--</div>-->
+    <!--</div>-->
+
+
+<!--</div>-->
+
+
+<hr>
+
+
+    
+    
+    
+
+
+{% endblock %}

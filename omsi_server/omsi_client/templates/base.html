@@ -1,0 +1,248 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8" >
+    <title>{% block title %}OpenMSI{% endblock %}</title>
+    <!-- <link rel="stylesheet" href="{{ STATIC_URL }}/bootstrap/css/bootstrap-theme.css" type="text/css" /> -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}/bootstrap/css/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}/bootstrap/css/bootstrapSwitch.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}/bootstrap/css/bootstrap-responsive.css" type="text/css" />
+
+    {% block styles %}
+    <style>
+
+        /* GLOBAL STYLES
+        -------------------------------------------------- */
+        /* Padding below the footer and lighter body text */
+
+
+        div.modal{
+            display: none;
+        }
+
+
+
+
+
+        }
+    </style>
+    {% endblock %}
+    <!-- <script src="{{ STATIC_URL }}/bootstrap/js/jquery.js"></script> -->
+    <!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap.js"></script> -->
+    <script src="{{ STATIC_URL }}/knockout-3.0.0.js"></script>
+    <script src="{{ STATIC_URL }}/jquery-1.10.2.min.js"></script>
+    <script src="{{ STATIC_URL }}/jquery-migrate-1.2.1.js"></script>
+    <script src="{{ STATIC_URL }}/typeahead.bundle.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/bootstrap/js/bootstrapSwitch.js"></script>
+
+    <!-- <script src="{{ STATIC_URL }}/newt.js"></script> -->
+    <!-- <script src="https://newt.nersc.gov/js/newt.js"></script> -->
+    <script src="{{ STATIC_URL }}/bootstrap.min.js"></script>
+
+    <!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap.min.js"></script> -->
+    <!-- <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.4.min.js"></script>    -->
+    <!-- <script src="http://html2canvas.hertzen.com/build/html2canvas.js"></script> -->
+    <!-- <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.1.0.js"></script> -->
+    <!-- <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script> -->
+    <!-- <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.0/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="{{ STATIC_URL }}/rgbcolor.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/canvg.js"></script>
+
+</head>
+
+
+<body min-height= "100%" height = "100%">
+
+<nav class="navbar navbar-inverse" role="navigation" style="margin-bottom:0px;">
+    <div class="container-fluid">
+        <div class="navbar-header pull-left">
+            <a class="navbar-brand" href="/openmsi/client/index.html">OpenMSI</a>
+        </div>
+        <div class="navbar-header pull-right">
+            <ul class="nav navbar-nav pull-left">
+                <li>
+                    {% if user.is_authenticated %}
+                    <a href="/openmsi/client/logout.html">Logout {{ user.username }}</a>
+                    {% else %}
+                    <a href="/openmsi/client/login.html">Login</a>
+
+                    {% endif %}
+                </li>
+                <li>
+                    {% if user.is_authenticated %}
+                    {% else %}
+                    <a href="/openmsi/client/omsiAccount">Request account</a>
+                    {% endif %}
+                </li>
+            </ul>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/openmsi/client/about.html">About</a></li>
+                <li><a href="/openmsi/client/contact.html">Contact</a></li>
+                <li><a href="/openmsi/client/news.html">News</a></li>
+                <li><a href="/openmsi/client/publications.html">Publications</a></li>
+
+                {% if user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Files <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/openmsi/resources/hierarchicalFilemanager.html">My Files</a></li>
+                        <li><a href="/openmsi/resources/fileUploader.html">Upload Files</a></li>
+                        <li><a href="/openmsi/resources/fileProcessor.html">Import Files</a></li>
+                        <li><a href="/openmsi/resources/jobManager.html">Manage Jobs</a></li>
+
+                        <!--<li><a href="https://globus.nersc.gov/xfer/StartTransfer#dest=nersc#dtn/project/projectdirs/openmsi/original_data/{{user.username}}" target="uploadIframe">Upload Files</a></li>-->
+                        <!--<li><a href="https://globus.nersc.gov/xfer/StartTransfer#dest=nersc#dtn/project/projectdirs/openmsi/omsi_data_private/{{user.username}}">Download Files</a></li>-->
+
+                    </ul>
+                </li>
+                {% else %}
+                    <li><a href="/openmsi/resources/hierarchicalFilemanager.html">Files</a></li>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Resources <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <!--<li><a href="https://nim.nersc.gov/nersc_account_request.php" target="_newtab">Getting an account</a></li>-->
+                        <!--<li><a href="http://www.nersc.gov/users/accounts/user-accounts/" target="_newtab">Help with your account</a></li>-->
+                        <!--<li><a href="#">Using the viewer</a></li>-->
+                        <!--<li><a href="#">Using the file browser</a></li>-->
+                        <li><a href="/openmsi/client/uploadHelp.html">Data upload</a></li>
+                        <li class="divider"></li>
+                        <!--<li><a href="#">Using the Web API</a></li>-->
+                        <!--<li><a href="#">File Format</a></li>-->
+                        <li><a href="/openmsi/client/bastet.html">BASTet</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Resources <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/openmsi/client/bastet.html">BASTet</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+
+
+
+
+<!-- <div id="main" role="main" min-height="100%"> -->
+{% block content %}{% endblock %}
+<!-- </div> -->
+<div class = "container" id="footer">
+    <footer class="row-fluid">
+        <div class="span12">
+            <p>&copy; 2012-2014 Lawrence Berkeley National Lab &middot; <a href="/openmsi/client/terms.html">Privacy & Terms</a>  &middot; <a href="/openmsi/client/contact.html">Contact</a></p>
+        </div>
+    </footer>
+</div>
+
+<div class="modal fade" id="canvashelp">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h3>Help:</h3>
+            </div>
+            <div class="modal-body">
+                <h4><p>To explore data:</p></h4>
+                <p>Click on a cross-hair to select a point and see its label. Click anywhere else to unselect it and hide the label.</p>
+                <p>Drag a point to move it around. Use arrow keys to move a selected point pixel by pixel.</p>
+                <p>To ensure full functionality of the page, please keep your browser zoom for the page to 100% (default).</p>
+                <hr>
+                <p>If you are still having trouble viewing the page contact us for technical support.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
+                <!-- <a href="#" class="btn btn-primary">Save Changes</a> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="blockKeys_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h3>To ensure full functionality of the page, please keep your browser zoom for the page to 100% (default)</h3>
+            </div>
+            <div class="modal-body">
+                <p>We're sorry, but we would prefer that you not change your browser's zoom-level.  When the zoom is set to something other than "actual size", it distorts the mass spectrometry images.</p>
+                <hr>
+                <p>Close this box when you're ready.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">Close</a>
+                <!-- <a href="#" class="btn btn-primary">Save Changes</a> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/jquery.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-transition.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-alert.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-modal.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-dropdown.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-scrollspy.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-tab.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-tooltip.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-popover.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-button.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-collapse.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-carousel.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrap-typeahead.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/bootstrap/js/bootstrapSwitch.js"></script> -->
+<!-- <script src="{{ STATIC_URL }}/knockout-2.2.1.js"></script> -->
+
+{% block scripts %}
+{% endblock %}
+<script>
+
+    document.addEventListener("keydown", function(e) {
+        if ((e.keyCode == 173||e.keyCode == 61||e.keyCode == 189||e.keyCode == 187)  && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+            e.preventDefault();
+            $('#blockKeys_modal').modal('show');
+        }
+    }, false);
+
+    // $(document).bind('keydown',function(e){
+    //     key = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+    //     if ((key==61 || key==173) && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+    //         e.preventDefault();
+    //
+    //             alert("going forward");
+    //     }
+    // });
+
+
+
+
+
+
+</script>
+
+
+</body>
+</html>

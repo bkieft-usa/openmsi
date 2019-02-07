@@ -1,0 +1,1940 @@
+{% extends "base.html" %}
+
+{% block styles %}
+
+<style type="text/css">
+
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.axis {
+	shape-rendering: crispEdges;
+}
+.x.axis .minor {
+	stroke-opacity: .5;
+}
+.x.axis.line, .x.axis path, .y.axis line, .y.axis path {
+	fill: none;
+	stroke: #000;
+}
+#leftDiv{
+	position: absolute;
+	top: 100px;
+	left: 20px;
+	width: 35%;
+	margin-right:1px;
+}
+
+#imageCanvas{
+     border:3px solid;
+     height: 100%;
+     width:100%;
+}
+#graphs{
+	position: fixed;
+	top: 100px;
+	bottom: 20px;
+	width: 61%;
+	right: 20px;
+}
+#graph1, #graph2{
+	display: block;
+	width: 100%;
+	height: 40%;
+	margin: 0;
+	clear: both;
+}
+
+#footer{
+	position: absolute;
+	bottom: 0;
+	text-align: right;
+}
+
+/*.modal {*/
+    /*overflow-y: auto;*/
+    /*max-height: 50%;*/
+/*}*/
+/**/
+.modalFlare {
+    overflow-y: auto;
+    /*height: 50%;*/
+}
+
+/*.modal-body*/
+/*{*/
+/*height:800px;*/
+/*overflow-y: scroll;*/
+/*}*/
+
+/*.modal {*/
+    /*overflow-y:auto;*/
+    /*max-height:90%;*/
+    /*margin-top:-45%;*/
+/*}*/
+
+@media all and (max-width: 767px){
+ #controlsRow{
+     margin-top:0px; 
+     margin-bottom:0px;
+ } 
+	#imageCanvas{
+		width: 90%;
+	}
+	#leftDiv{
+      position: relative;
+		top: 0;
+		left: 0;
+		width: 90%;
+	}
+
+	#graphs{
+		position: relative;
+		top: 0;
+		left: 0;
+		width: 100%;
+		right: default;
+	}
+	#graph1, #graph2{
+		width: 100%;
+		height: 200px;
+	}
+
+	#footer{
+		position: relative;
+	}
+
+
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="modal fade" id="flareGraphModal" >
+    <!--;overflow-y:scroll;-->
+    <div class="modal-dialog modalFlare" style="width:840px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <!--<h3 id="notWebKit-Warning" style="color:red">To enable scrolling of the graph below, please switch to an current version of Chrome or Safari.</h3>-->
+
+                <h3>Entries for this file</h3><p>Click on a entry or button to view, manage permissions, see experimental details, and download</p>
+            </div>
+            <div class="modal-body" >
+                          <div id="svgDivFlare" ></div>
+
+    <!--<a href="#" class="btn" data-dismiss="modal">Close</a>-->
+            </div>
+            <!--<div class="modal-footer">-->
+
+                <!-- <a href="#" class="btn btn-primary">Save Changes</a> -->
+            <!--</div>-->
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="flareLongTextModal" >
+    <!--;overflow-y:scroll;-->
+    <div class="modal-dialog modalFlare" style="width:740px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h3>Description</h3>
+            </div>
+            <div class="modal-body" >
+                          <p id="flareLongTextText" ></p>
+
+    <!--<a href="#" class="btn" data-dismiss="modal">Close</a>-->
+            </div>
+            <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+	<!--var default_file = "{{default_file}}"-->
+	<!--var default_expIndex = "{{default_expIndex}}"-->
+	<!--var default_dataIndex = "{{default_dataIndex}}"-->
+	<!--var default_anaIndex = "{{default_anaIndex}}"-->
+<div class="row-fluid" style="background-color:#eee;padding-top:4px;padding-bottom:4px;">
+    <!--<div class="span6">-->
+<div class="btn-group" style="float:right;margin-right:10px;">
+        <!--<div id="svgDiv" style="position:fixed;left:0px;top:55px;"></div>-->
+<a href="#flareGraphModal" role="button" class="btn btn-default" data-toggle="modal" id="flareLaunchButton">{{default_file}},&nbsp;
+    Entry#{{default_expIndex}},
+    {% if default_dataIndex %}
+        Dataset#
+    {% else %}
+        Analysis#
+    {% endif %}
+    {{default_dataIndex}}{{default_anaIndex}}</a>
+        <!---->
+        <!--;overflow:auto-->
+        <!--z-index:0;-->
+
+
+       <!--</div>-->
+       <!--<div class="span5">-->
+
+                <!--<button class="btn btn-default" id='managePermissionsButton' rel="tooltip" title="Manage Permissions"  style="float:right;"><i class="glyphicon glyphicon-lock"></i></button>-->
+           <button class="btn btn-default " id="setCacheOption" rel="tooltip" title="Remeber or Ignore Selected Channels in Browser">
+                    {% if enableClientCache == "true" %}Store Settings: ON{% else %}Store Settings: OFF{% endif %}
+            </button>
+           <button class="btn btn-default open-saveDialogModal" id='saveButton' data-toggle="modal" data-id="" title="Save" href="#saveDialogModal" rel="tooltip"  style="float:right;margin-right:10px;"><i class="glyphicon glyphicon-download-alt"></i></button>
+                <!--<button class="btn btn-default dropdown-toggle" id="DataAndAnalysisMenu" data-toggle="dropdown" rel="tooltip" title="Select Main Data">-->
+                    <!--Select Data<span class="caret"></span>-->
+                <!--</button>-->
+                <!--<ul class="dropdown-menu pull-right" id = "DataAndAnalysisList">-->
+                    <!--<li><a href="#">A</a></li>-->
+                    <!--<li><a href="#">B</a></li>-->
+                <!--</ul>-->
+            <!--</div>-->
+        </div>
+</div>
+
+
+<div id="viewerUnit">
+    <div id="leftDiv">
+        <div class="row-fluid" style="margin-bottom:10px;">
+            <div class="btn-group">
+                <button class="btn btn-default dropdown-toggle" id="ImageDataSelect" data-toggle="dropdown" rel="tooltip" title="Select Image Data Option">
+                    Image Data
+                    <span class="caret">
+                    </span>
+                </button>
+                <ul class="dropdown-menu pull-left" id ="SliceList">
+                </ul>
+            </div>
+
+           
+        </div>
+
+        <div id = "controlsRow" class="row-fluid" style="margin-top:4px; margin-bottom:4px;">
+            <div class = "span4">
+                <span style="horizontal-align:middle" >
+                    Channel 1:
+                </span>
+                <span class="switch switch-mini" id = "redCheckBox" data-on="danger" rel="tooltip" title="Toggle Red Channel">
+                    <input type="checkbox" class="form-control" checked />
+                </span>
+                
+                <div class="row-fluid">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button id='channel1ToolButton' class="btn btn-danger"  data-title="Channel 1 Control:" data-bind="popover1: '#channel1Template'"><i class="glyphicon glyphicon-wrench"></i></button>
+                        </span>     
+                        <input id="redinput" class="form-control" type="number"  min = "0" max = "2000" step = "0.5" value={{channel1Value|default:"746.22"}} placeholder="Red channel" data-bind="value: $data.channel1Value, valueUpdate: 'change'" data-bind="step: $data.channel1Step, valueUpdate: 'change'">
+        
+                    </div>
+                </div>
+            </div>
+
+            <div class = "span4">
+                <span style="horizontal-align:middle" >
+                    Channel 2:
+                </span>
+                <span class="switch switch-mini" id = "greenCheckBox" data-on="success" rel="tooltip" title="Toggle Green Channel">
+                    <input type="checkbox" class="form-control" checked />
+                </span>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button id='channel2ToolButton' class="btn btn-success" data-placement="right" data-title="Channel 2 Control:" data-bind="popover2: '#channel2Template'"><i class="glyphicon glyphicon-wrench"></i></button>
+                    </span>
+                    <input id="greeninput" class="form-control" type="number" min = "0" max = "2000" step="0.5" value={{channel2Value|default:"621.98"}} placeholder="Green channel" data-bind="value: $data.channel2Value, valueUpdate: 'change'" data-bind="step: $data.channel2Step, valueUpdate: 'change'">
+                </div>
+            </div>     
+
+            <div class = "span4">
+                <span style="horizontal-align:middle" >
+                    Channel 3:
+                </span>
+                <span class="switch switch-mini" id = "blueCheckBox" data-on="primary" rel="tooltip" title="Toggle Blue Channel">
+                    <input type="checkbox" class="form-control" checked />
+                </span>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button id='channel3ToolButton' class="btn btn-primary" data-placement="left" data-title="Channel 3 Control:" data-bind="popover3: '#channel3Template'"><i class="glyphicon glyphicon-wrench"></i></button>
+                    </span>
+                    <input id="blueinput" class="form-control" type="number" min = "0" max = "2000" step = "0.5" value={{channel3Value|default:"523.36"}} placeholder="Blue channel" data-bind="value: $data.channel3Value, valueUpdate: 'change'" data-bind="step: $data.channel3Step, valueUpdate: 'change'">
+                </div> 
+            </div>     
+        </div> <!-- End of Controls Row -->
+
+        <div id = "canvasContainer" style="position:relative;">
+            <canvas id="imageCanvas" style="margin-top:10px;"><h1>Please update to a browser that supports canvas</h1></canvas> 
+            <div id = "zoomControls" style = "top:15px;left:5px;position:absolute;width:100%;">
+                <button id="scaleplus" type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-plus"></i></button>
+                <button id="scaleminus" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-minus"></i></button>
+            </div>
+        </div>
+    </div><!-- close leftdiv -->
+
+    <div id="graphs">
+        <div class="row-fluid"  style="margin-left:10px;">
+            <div class="input-group" >
+                <span class="input-group-btn">
+                    <button class="btn btn-default" id="helpButton" rel="tooltip" title="Help"><i class="glyphicon glyphicon-question-sign"></i></button>
+                </span>
+
+                <input type="text" class="form-control span2" style="margin-left:0px;margin-right:0px;" id='mzMin' data-bind="value: $data.manRangeMin, valueUpdate: 'change'" rel="tooltip" title="Set Minimum Displayed Value">
+                <input type="text" class="form-control span2" style="margin-left:0px;margin-right:0px;" id='mzMax' data-bind="value: $data.manRangeMax, valueUpdate: 'change'" rel="tooltip" title="Set Maximum Displayed Value">
+
+                <div class="btn-group" style="margin-left:0px;" >
+                    <button class="btn btn-default" id="unzoom1" style = "margin-left:0px;-moz-border-radius: 0px;-webkit-border-radius: 0px;border-radius: 0px;" rel="tooltip" title="Reset Zoom"><i class="glyphicon glyphicon-fullscreen"></i></button>
+                    <button class="btn btn-default" id="partialUnzoom" rel="tooltip" title="Partial Unzoom"><i class="glyphicon glyphicon-resize-full"></i></button>
+                    <button class="btn btn-default" id="panleft1" rel="tooltip" title="Pan Left"><i class="glyphicon glyphicon-backward"></i></button>
+                    <button class="btn btn-default" id="panright1" rel="tooltip" title="Pan Right"><i class="glyphicon glyphicon-forward"></i></button>
+                    <div class="btn-group"  >
+                        <button class="btn btn-default dropdown-toggle" id="SpectraDataSelect" data-toggle="dropdown" rel="tooltip" title="Select Spectrum Data Option">
+                            Spectra Data
+                            <span class="caret">
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" id = "SpectrumList">
+                        </ul>
+                    </div>
+                </div> <!-- button group -->
+            </div><!-- /input-group -->
+        </div><!-- row -->
+        <h4 id="graph1head"  style="margin-left:15px;">Point #1: {{default_cursorCol1}}, {{default_cursorRow1}}</h4>
+                <div id="graph1" style="margin-left:10px;float:right;"></div>
+                <div id="hilbertGraph1" style="margin-left:100px;position:absolute;"></div>
+
+        <h4 id="graph2head" style="margin-left:15px;">Point #2: {{default_cursorCol2}}, {{default_cursorRow2}}</h4>
+        <div id="graph2" style="margin-left:10px;float:right"></div>
+        <div id="hilbertGraph2" style="margin-left:100px;position:absolute;"></div>
+
+    </div>
+</div><!-- close viewerUnit -->
+
+
+<div class="modal fade" id="canvashelp">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h3>Help:</h3>
+            </div>
+            <div class="modal-body">
+                <h4><p>To explore data:</p></h4>
+                <p>Click on a cross-hair to select a point and see its label. Click anywhere else to unselect it and hide the label.</p>
+                <p>Drag a point to move it around. Use arrow keys to move a selected point pixel by pixel.</p>
+                <p>To ensure full functionality of the page, please keep your browser zoom for the page to 100% (default).</p>
+                <hr>
+                <p>If you are still having trouble viewing the page contact us for technical support.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
+                <!-- <a href="#" class="btn btn-primary">Save Changes</a> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="resetZoom_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h3>To ensure full functionality of the page, please reset your browser zoom for the page to 100% (default).</h3>
+            </div>
+            <div class="modal-body">
+                <h4><p>To reset your browser zoom:</p></h4>
+                <p>On Windows computers: Press Ctrl+0 ("Control" and "Zero" simultaneously),</p>
+                <p>on Apple computers: Press Cmd+0 ("Command" and "Zero" simultaneously), </p>
+                <p>or go to the top menu and select: View, default zoom</p>
+                <hr>
+                <p><strong>In Firefox: </strong>Your system will appear frozen for 10-30 seconds.  Once your system recovers reset the zoom.</p>
+                <p><strong>In Chrome: </strong>You can reset the zoom now.</p>
+                <hr>
+                <p>If you are still having trouble viewing the page contact us for technical support.</p>
+            </div>
+            <div class="modal-footer">
+                <!-- <a href="#" class="btn btn-default" data-dismiss="modal">Close</a> -->
+                <!-- <a href="#" class="btn btn-primary">Save Changes</a> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ STATIC_URL }}downloadButton.js"></script>
+<div class="modal"  id="saveDialogModal">
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">×</button>
+                <h3>Download utility</h3>
+            </div>
+            <div class="modal-body" id="saveModal_body" style="height:100%;">
+                <p> Current File:</p>
+                <input type="text" name="fileName" id="fileName" value=""/>
+                <p> URL to this view:</p>
+                <textarea rows="2" style="width:95%;" type="text" name="viewURL" id="viewURL" value=""/></textarea>
+                <p>Right click to save your MSI image.  Many people prefer to zoom out and drag the pointers away from the field of view before saving
+                    <a id='saveImageButton' title="Save" class="btn btn-primary" href=""><i class="glyphicon glyphicon-download-alt"></i></a>
+                </p>
+                <!-- <p>Save as PNG:</p> -->
+                <img id="msi-img" />
+                <p>Spectra #1 (After click, wait a few seconds for image to render and download):
+                    <a id='saveSpectra1Button' title="Save" class="btn btn-primary" href="">PNG<i class="glyphicon glyphicon-download-alt"></i></a>
+                    <a id='saveSVGSpectra1Button' title="Save" class="btn btn-primary" href="">SVG<i class="glyphicon glyphicon-download-alt"></i></a>
+                </p>
+                <canvas id="svg-canvas1" ></canvas>
+                <img id="svg-img1" />
+                <p>Spectra #2: (After click, wait a few seconds for image to render and download):
+                    <a id='saveSpectra2Button' title="Save" class="btn btn-primary" href="">PNG<i class="glyphicon glyphicon-download-alt"></i></a>
+                    <a id='saveSVGSpectra2Button' title="Save" class="btn btn-primary" href="">SVG<i class="glyphicon glyphicon-download-alt"></i></a>
+                </p>                         
+                <canvas id="svg-canvas2"></canvas>
+                <img id="svg-img2" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="html/text" id="channel1Template">
+<div style="margin-left:10px;">
+        <div class="row">
+          <div class="col-lg-7">
+            <h5 style="margin-bottom:2px;margin-top:1px;">Value</h5>
+            </div>
+        <div class="col-lg-5">
+          <h5 style="margin-bottom:2px;margin-top:1px;">Range</h5>
+          </div>
+        </div>
+        
+	    <div class="row">
+          <div class="col-lg-5">
+            <input class="form-control input-sm" id='channel1Value' data-bind="value: $data.channel1Value, valueUpdate: 'change'" type='number'>
+          </div>
+          <div class="col-lg-2">          
+            <div style="margin-bottom:0px;margin-top:0px;margin-left:0px;margin-right:0px;">&plusmn;</div>
+           </div>
+          <div class="col-lg-5">
+            <input class="form-control input-sm" data-bind="value: $data.channel1Range, valueUpdate: 'change'" type='number'>
+          </div>
+        </div>
+            
+    <div class="row" style="margin-top:2px;">
+	    <div class="col-lg-7">
+            <h5>Spinner Step-size:</h5>
+        </div>
+        <div class="col-lg-5">
+            <input class="form-control input-sm"  id='channel1Step' data-bind="value: $data.channel1Step, valueUpdate: 'change'" type='number'>
+        </div>
+    </div>
+    
+    <div class='row'><div class='col-lg-12'>
+        <hr style='border: 1px solid #888;margin-top:1px;margin-bottom:6px;'>
+    </div></div>
+    
+    <div class="row"><div class="col-lg-12">  
+        <h5 style="margin-bottom:4px;margin-top:1px;">Intensity filter (percentile [0-100]):</h5>
+    </div></div>
+    
+    <div class="row">
+          <div class="col-lg-6">
+            <h5 style="margin-bottom:2px;margin-top:1px;">Low Cutoff</h5>
+          </div>
+          <div class="col-lg-6">
+               <h5 style="margin-bottom:2px;margin-top:1px;">High Cutoff</h5>
+          </div>
+      </div>
+      
+    <div class="row">
+      <div class="col-lg-6">
+        <input class="form-control input-sm" data-bind="value: $data.channel1MinPctile, valueUpdate: 'change'" id='channel1LowPercentile' placeholder='5'  type='number'>
+      </div>
+      <div class="col-lg-6">
+        <input class="form-control input-sm" data-bind="value: $data.channel1MaxPctile, valueUpdate: 'change'" type='number' id='channel1HighPercentile' placeholder='95'>
+      </div>
+    </div>
+    
+</div>    
+
+</script >
+
+
+
+<script type="html/text" id="channel2Template">
+<div style="margin-left:10px;">
+        <div class="row">
+          <div class="col-lg-7">
+            <h5 style="margin-bottom:2px;margin-top:1px;">Value</h5>
+            </div>
+        <div class="col-lg-5">
+          <h5 style="margin-bottom:2px;margin-top:1px;">Range</h5>
+          </div>
+        </div>
+	    <div class="row">
+          <div class="col-lg-5">
+            <input class="form-control input-sm" id='channel2Value' data-bind="value: $data.channel2Value, valueUpdate: 'change'" type='number'>
+          </div>
+          <div class="col-lg-2">          
+            <div style="margin-bottom:0px;margin-top:0px;margin-left:0px;margin-right:0px;">&plusmn;</div>
+           </div>
+          <div class="col-lg-5">
+            <input class="form-control input-sm" data-bind="value: $data.channel2Range, valueUpdate: 'change'" type='number'>
+          </div>
+        </div>
+            
+    <div class="row" style="margin-top:2px;">
+	    <div class="col-lg-7">
+            <h5>Spinner Step-size:</h5>
+        </div>
+        <div class="col-lg-5">
+            <input class="form-control input-sm"  id='channel2Step' data-bind="value: $data.channel2Step, valueUpdate: 'change'" type='number'>
+        </div>
+    </div>
+    
+    <div class='row'><div class='col-lg-12'>
+        <hr style='border: 1px solid #888;margin-top:1px;margin-bottom:6px;'>
+    </div></div>
+    
+    <div class="row"><div class="col-lg-12">  
+        <h5 style="margin-bottom:4px;margin-top:1px;">Intensity filter (percentile [0-100]):</h5>
+    </div></div>
+    
+    <div class="row">
+          <div class="col-lg-6">
+            <h5 style="margin-bottom:2px;margin-top:1px;">Low Cutoff</h5>
+          </div>
+          <div class="col-lg-6">
+               <h5 style="margin-bottom:2px;margin-top:1px;">High Cutoff</h5>
+          </div>
+      </div>
+      
+    <div class="row">
+      <div class="col-lg-6">
+        <input class="form-control input-sm" data-bind="value: $data.channel2MinPctile, valueUpdate: 'change'" id='channel2LowPercentile' placeholder='5'  type='number'>
+      </div>
+      <div class="col-lg-6">
+        <input class="form-control input-sm" data-bind="value: $data.channel2MaxPctile, valueUpdate: 'change'" type='number' id='channel2HighPercentile' placeholder='95'>
+      </div>
+    </div>
+</div>
+</script >
+
+
+<script type="html/text" id="channel3Template">
+<div style="margin-left:10px;">
+        <div class="row">
+          <div class="col-lg-7">
+            <h5 style="margin-bottom:2px;margin-top:1px;">Value</h5>
+            </div>
+        <div class="col-lg-5">
+          <h5 style="margin-bottom:2px;margin-top:1px;">Range</h5>
+          </div>
+        </div>
+        
+    
+	    <div class="row">
+          <div class="col-lg-5">
+            <input class="form-control input-sm" id='channel3Value' data-bind="value: $data.channel3Value, valueUpdate: 'change'" type='number'>
+          </div>
+          <div class="col-lg-2">          
+            <div style="margin-bottom:0px;margin-top:0px;margin-left:0px;margin-right:0px;">&plusmn;</div>
+           </div>
+          <div class="col-lg-5">
+            <input class="form-control input-sm" data-bind="value: $data.channel3Range, valueUpdate: 'change'" type='number'>
+          </div>
+        </div>
+            
+    <div class="row" style="margin-top:2px;">
+	    <div class="col-lg-7">
+            <h5>Spinner Step-size:</h5>
+        </div>
+        <div class="col-lg-5">
+            <input class="form-control input-sm"  id='channel3Step' data-bind="value: $data.channel3Step, valueUpdate: 'change'" type='number'>
+        </div>
+    </div>
+    
+    <div class='row'><div class='col-lg-12'>
+        <hr style='border: 1px solid #888;margin-top:1px;margin-bottom:6px;'>
+    </div></div>
+    
+    <div class="row"><div class="col-lg-12">  
+        <h5 style="margin-bottom:4px;margin-top:1px;">Intensity filter (percentile [0-100]):</h5>
+    </div></div>
+    
+    <div class="row">
+          <div class="col-lg-6">
+            <h5 style="margin-bottom:2px;margin-top:1px;">Low Cutoff</h5>
+          </div>
+          <div class="col-lg-6">
+               <h5 style="margin-bottom:2px;margin-top:1px;">High Cutoff</h5>
+          </div>
+      </div>
+      
+    <div class="row">
+      <div class="col-lg-6">
+        <input class="form-control input-sm" data-bind="value: $data.channel3MinPctile, valueUpdate: 'change'" id='channel3LowPercentile' placeholder='5'  type='number'>
+      </div>
+      <div class="col-lg-6">
+        <input class="form-control input-sm" data-bind="value: $data.channel3MaxPctile, valueUpdate: 'change'" type='number' id='channel3HighPercentile' placeholder='95'>
+      </div>
+    </div>
+</div>
+</script >
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+<script src="{{ STATIC_URL }}getFileList_addEventHandlers.js"></script>
+<script src="{{ STATIC_URL }}simplify_new.js"></script>
+<script src="{{ STATIC_URL }}spectra.js"></script>
+<script src="{{ STATIC_URL }}makeFileFlare.js"></script>
+
+<script>
+
+//if ($.browser.webkit)
+//{
+//   $('#notWebKit-Warning').hide();
+//}
+
+
+var weAreAllSet = 0;
+var RedisVisible = false;
+var RedclickedAway = false;
+var GreenisVisible = false;
+var GreenclickedAway = false;
+var BlueisVisible = false;
+var BlueclickedAway = false;
+
+$('#saveDialogModal .modal-dialog').css({
+       'width': function () { 
+           return ($(document).width() * .9) + 'px';  
+       }
+});
+
+
+
+var ViewModel ={
+    channel1Value: ko.observable({{channel1Value|default:"746.2"}}),
+    channel1Step: ko.observable(0.5),
+    channel1Range: ko.observable({{channel1RangeValue|default:"0.2"}}),
+    channel1MaxPctile: ko.observable(99),
+    channel1MinPctile: ko.observable(1),
+    channel2Value: ko.observable({{channel2Value|default:"621.98"}}),
+    channel2Step: ko.observable(0.5),
+    channel2Range: ko.observable({{channel2RangeValue|default:"0.2"}}),
+    channel2MaxPctile: ko.observable(99),
+    channel2MinPctile: ko.observable(1),
+    channel3Value: ko.observable({{channel3Value|default:"523.36"}}),
+    channel3Step: ko.observable(0.5),
+    channel3Range: ko.observable({{channel3RangeValue|default:"0.2"}}),
+    channel3MaxPctile: ko.observable(99),
+    channel3MinPctile: ko.observable(1),
+    manRangeMin: ko.observable(),
+    manRangeMax: ko.observable()
+};
+
+// channel 1 subscriptions    
+ViewModel.channel1Value.subscribe(function (newText) {
+    omsi_globals.channel1Value = newText;
+    if (weAreAllSet == 1)
+    {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Value", newText);
+        }
+       get_new_channel(0,omsi_globals.channel1Value,omsi_globals.channel1Range);
+    }
+});
+
+ViewModel.channel1Step.subscribe(function (newText) {
+    // if (weAreAllSet == 1)
+    // {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Step", newText);
+        }
+        $('#redinput').prop('step', newText);  
+    // }
+});
+
+ViewModel.channel1Range.subscribe(function (newText) {
+    omsi_globals.channel1Range = newText;
+    if (weAreAllSet == 1)
+    {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Range", newText);
+        }
+    	get_new_channel(0,omsi_globals.channel1Value,omsi_globals.channel1Range);
+	}
+});	
+	
+ViewModel.channel1MaxPctile.subscribe(function (newText) {
+    omsi_globals.redPrctileMax = newText;
+    get_new_channel(0, ViewModel.channel1Value(), ViewModel.channel1Range())
+
+});
+
+ViewModel.channel1MinPctile.subscribe(function (newText) {
+    omsi_globals.redPrctileMin = newText;
+    get_new_channel(0, ViewModel.channel1Value(), ViewModel.channel1Range())
+});
+
+//channel 2 subscriptions
+ViewModel.channel2Value.subscribe(function (newText) {
+    omsi_globals.channel2Value = newText;
+    if (weAreAllSet == 1)
+    {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Value", newText);
+        }
+    	get_new_channel(1,omsi_globals.channel2Value,omsi_globals.channel2Range);
+	}
+});
+
+ViewModel.channel2Step.subscribe(function (newText) {
+    // if (weAreAllSet == 1)
+    // {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Step", newText);
+        }
+        $('#greeninput').prop('step', newText);  
+    // }
+});
+
+ViewModel.channel2Range.subscribe(function (newText) {
+    omsi_globals.channel2Range = newText;
+    if (weAreAllSet == 1)
+    {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Range", newText);
+        }
+    	get_new_channel(1,omsi_globals.channel2Value,omsi_globals.channel2Range);
+	}
+});	
+	
+ViewModel.channel2MaxPctile.subscribe(function (newText) {
+    omsi_globals.greenPrctileMax = newText;
+    get_new_channel(1, ViewModel.channel2Value(), ViewModel.channel2Range())
+});
+
+ViewModel.channel2MinPctile.subscribe(function (newText) {
+    omsi_globals.greenPrctileMin = newText;
+    get_new_channel(1, ViewModel.channel2Value(), ViewModel.channel2Range())
+});
+
+//channel 3 subscriptions
+ViewModel.channel3Value.subscribe(function (newText) {
+    omsi_globals.channel3Value = newText;
+    if (weAreAllSet == 1)
+    {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Value", newText);
+        }
+    	get_new_channel(2,omsi_globals.channel3Value,omsi_globals.channel3Range);
+	}
+});
+
+ViewModel.channel3Step.subscribe(function (newText) {
+    // if (weAreAllSet == 1)
+    // {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Step", newText);
+        }
+        $('#blueinput').prop('step', newText);  
+    // }
+});
+
+ViewModel.channel3Range.subscribe(function (newText) {
+    omsi_globals.channel3Range = newText;
+    if (weAreAllSet == 1)
+    {
+        if (omsi_globals.cacheValue == "true")
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Range", newText);
+        }
+    	get_new_channel(2,omsi_globals.channel3Value,omsi_globals.channel3Range);
+	}
+});	
+	
+ViewModel.channel3MaxPctile.subscribe(function (newText) {
+    omsi_globals.bluePrctileMax = newText;
+    get_new_channel(2, ViewModel.channel3Value(), ViewModel.channel3Range())
+});
+
+ViewModel.channel3MinPctile.subscribe(function (newText) {
+    omsi_globals.bluePrctileMin = newText;
+    get_new_channel(2, ViewModel.channel3Value(), ViewModel.channel3Range())
+});
+
+    
+
+//Manual Range Subscriptions
+ViewModel.manRangeMin.subscribe(function (newText) {
+   if (omsi_globals.d3xranges[0][1]!=0 && omsi_globals.d3xranges[1][1]!=0)
+   {
+       updateZoom(1, newText, ViewModel.manRangeMax());
+       updateZoom(2, newText, ViewModel.manRangeMax());  
+   }
+});
+
+
+ViewModel.manRangeMax.subscribe(function (newText) {
+    if (omsi_globals.d3xranges[0][1]!=0 && omsi_globals.d3xranges[1][1]!=0)
+    {
+        updateZoom(1,ViewModel.manRangeMin(), newText);
+        updateZoom(2, ViewModel.manRangeMin(), newText);  
+    }
+});
+
+ko.bindingHandlers.popover1 = {
+    init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        var cssSelectorForPopoverTemplate = ko.utils.unwrapObservable(valueAccessor());
+        var popOverTemplate = "<div id='channel1Popover'>" + $(cssSelectorForPopoverTemplate).html() + 
+        "</div>";
+        $(element).popover({
+            content: popOverTemplate,
+            html: true,
+            trigger: 'manual'
+        });
+
+        $(element).click(function(e) {
+            $(this).popover('show');
+            RedisVisible = true
+            RedclickedAway = false
+            e.preventDefault()
+                $('.popover').bind('click',function() {
+                    RedclickedAway = false
+                });
+            var thePopover = document.getElementById("channel1Popover");
+            ko.applyBindings(viewModel, thePopover);
+        });
+       }
+};
+
+
+ko.bindingHandlers.popover2 = {
+    init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        var cssSelectorForPopoverTemplate = ko.utils.unwrapObservable(valueAccessor());
+        var popOverTemplate = "<div id='channel2Popover'>" + $(cssSelectorForPopoverTemplate).html() + "</div>";
+        $(element).popover({
+            content: popOverTemplate,
+            html: true,
+            trigger: 'manual'
+        });
+
+        $(element).click(function(e) {
+            $(this).popover('show');
+            GreenisVisible = true
+            GreenclickedAway = false
+            e.preventDefault()
+                $('.popover').bind('click',function() {
+                    GreenclickedAway = false
+                });
+            var thePopover = document.getElementById("channel2Popover");
+            ko.applyBindings(viewModel, thePopover);
+        });
+       },
+    };
+
+ko.bindingHandlers.popover3 = {
+    init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        var cssSelectorForPopoverTemplate = ko.utils.unwrapObservable(valueAccessor());
+        var popOverTemplate = "<div id='channel3Popover'>" + $(cssSelectorForPopoverTemplate).html() + "</div>";
+        $(element).popover({
+            content: popOverTemplate,
+            html: true,
+            trigger: 'manual'
+        });
+
+        $(element).click(function(e) {
+            $(this).popover('show');
+            BlueisVisible = true
+            BlueclickedAway = false
+            
+            e.preventDefault()
+                $('.popover').bind('click',function() {
+                    BlueclickedAway = false
+                });
+            var thePopover = document.getElementById("channel3Popover");
+            ko.applyBindings(viewModel, thePopover);
+        });
+       },
+    };
+
+
+ko.applyBindings(ViewModel);
+
+
+
+$(document).click(function(e) {
+  if(RedisVisible && RedclickedAway)
+  {
+     $('#channel1ToolButton').popover('hide')
+    RedisVisible = RedclickedAway = false
+  }
+  else
+  {
+    RedclickedAway = true
+  }
+});
+
+$(document).click(function(e) {
+  if(GreenisVisible && GreenclickedAway)
+  {
+     $('#channel2ToolButton').popover('hide')
+    GreenisVisible = GreenclickedAway = false
+  }
+  else
+  {
+    GreenclickedAway = true
+  }
+});
+
+$(document).click(function(e) {
+  if(BlueisVisible && BlueclickedAway)
+  {
+     $('#channel3ToolButton').popover('hide')
+    BlueisVisible = BlueclickedAway = false
+  }
+  else
+  {
+    BlueclickedAway = true
+  }
+});
+
+ 	 hasPageBeenResized();
+
+     $('#redCheckBox').change(function() {
+         draw();
+         if ($('#redCheckBox').bootstrapSwitch('status') == true) {
+             $("#redinput").prop('disabled', false);
+         }
+         else
+         {
+             $("#redinput").prop('disabled', true);
+         }
+     });
+     $('#greenCheckBox').change(function() {
+         draw();
+         if ($('#greenCheckBox').bootstrapSwitch('status') == true) {
+              $("#greeninput").prop('disabled', false);
+          }
+          else
+          {
+              $("#greeninput").prop('disabled', true);
+          }
+     });
+     $('#blueCheckBox').change(function() {
+         draw();
+         if ($('#blueCheckBox').bootstrapSwitch('status') == true) {
+              $("#blueinput").prop('disabled', false);
+          }
+          else
+          {
+              $("#blueinput").prop('disabled', true);
+          }
+     });
+     
+
+ 	 
+     // $('#redCheckBox').toggleButtons();
+     $('#canvashelp').modal('hide')
+	
+	var api_root = '{{ api_root }}';
+	
+	//Default file settings requested by the user URL	
+	var default_file = "{{default_file}}"
+	var default_expIndex = "{{default_expIndex}}"
+	var default_dataIndex = "{{default_dataIndex}}"
+	var default_anaIndex = "{{default_anaIndex}}"
+	//Default cursor settings requested by the user URL
+	var default_cursorCol1 ="{{default_cursorCol1}}"
+	var default_cursorRow1 ="{{default_cursorRow1}}"
+	var default_cursorCol2 ="{{default_cursorCol2}}"
+	var default_cursorRow2 ="{{default_cursorRow2}}"
+    var enableClientCache = "{{enableClientCache}}"
+	
+	// We use a set of global variables stored as attributes of a global object, omsi_globals, to prevent name collisions
+	var omsi_globals = {
+		points: [],  //holds all our image points
+		selectedPoints: [],  //holds selected points
+		mzvec: [{useIndex:0,values:[]}],
+		translatePos: {},
+		// brightness: 1.0,
+		// brightnessMultiplier: 0.9;
+		scale: 2.0,
+		scaleMultiplier: 0.9,
+		startDragOffset: {},
+		startDrag: {},
+		mousedown: false,
+		im_width: 60,
+		im_height: 60,
+		pointinfo: [],
+		plotpoints: [],  //holds update trigger and data points initially used to render spectrum plots. [0] is point 1, [1] is point 2
+		imagedata: [{update:0,image:[],lowPrctile:0,highPrctile:1000}],
+		canvas: document.getElementById("imageCanvas"),
+		//mzmin: 0, //sets the min for mz-axis
+		//mzmax: 1000000, //sets the max for mz-axis
+		redPrctileMin: ViewModel.channel1MinPctile(),
+		redPrctileMax: ViewModel.channel1MaxPctile(),
+		greenPrctileMin: ViewModel.channel2MinPctile(),
+		greenPrctileMax: ViewModel.channel2MaxPctile(),
+		bluePrctileMin: ViewModel.channel3MinPctile(),
+		bluePrctileMax: ViewModel.channel3MaxPctile(),
+		channel1Value:ViewModel.channel1Value(),
+		channel1Range:ViewModel.channel1Range(),
+		channel2Value:ViewModel.channel2Value(),
+		channel2Range:ViewModel.channel2Range(),
+		channel3Value:ViewModel.channel3Value(),
+		channel3Range:ViewModel.channel3Range(),
+		//for spectra
+		//initialize spectrum graph metrics
+	    container_dimensions: {},
+	    margins: {top: 10, right: 20, bottom: 40, left: 80},
+		chart_dimensions:{},
+		startx: 0,
+		threshold: 300,  // m/z cutoff for switching to raw data from downsampled data
+		d3data: [], //holds data points currently used to render spectrum plots. [0] is point 1, [1] is point 2
+		d3xranges: [[0, 0],[0, 0]], //holds ranges of x values currently used to scale spectrum plots. [0][0] is min x for pt 1, [0][1] is max x for pt 1
+		d3iranges: [[0, 0], [0, 0]],//holds ranges of indices, relative to full set, currently used to scale spectrum plots. [0][0] is min i for pt 1, [0][1] is max i for pt 1
+		zaxisSpectrum: "m/z", //The title for the x-axis of the spectrum
+		zaxisSlice: "m/z", //The tiel of the z-axis when selecting image slices
+		y_scale: {},
+        // zoomlinked: true,
+        cacheValue: "{{enableClientCache}}",
+        doHilbert:0
+	};
+	
+    // function startup() {
+    //      var el = document.getElementsByTagName("canvas")[0];
+    //      el.addEventListener("touchstart", handleStart, false);
+    //      el.addEventListener("touchend", handleEnd, false);
+    //      el.addEventListener("touchcancel", handleCancel, false);
+    //      el.addEventListener("touchleave", handleEnd, false);
+    //      el.addEventListener("touchmove", handleMove, false);
+    //      log("initialized.");
+    //    }
+
+$(document).ready(function(){
+
+
+    $('[rel="tooltip"]').tooltip({
+        placement : 'top',
+        container: 'body',
+        delay: { show: 750, hide: 100 }
+    });
+    
+    $("#setCacheOption").click(function (e) {
+        var $el = $(this);
+        str = $el.html();
+        str = str.trim();          
+        if (str == "Store Settings: ON")
+        {
+            $el.html("Store Settings: OFF");
+            omsi_globals.cacheValue = "false";              
+        }
+        else
+        {
+            $el.html("Store Settings: ON");
+            omsi_globals.cacheValue = "true";  
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Value",ViewModel.channel1Value());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Step",ViewModel.channel1Step());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Range",ViewModel.channel1Range());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Value",ViewModel.channel2Value());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Step",ViewModel.channel2Step());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Range",ViewModel.channel2Range());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Value",ViewModel.channel3Value());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Step",ViewModel.channel3Step());
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Range",ViewModel.channel3Range());            
+        }          
+    });
+    
+	//run when page is resized
+	onresize = hasPageBeenResized;
+	
+	 var _gaq = _gaq || [];
+	 _gaq.push(['_setAccount', 'UA-39099473-1']);
+	 _gaq.push(['_trackPageview']);
+	
+	(function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+	
+	omsi_globals.filename = default_file; 
+
+	if (default_dataIndex == "")
+	{
+	    omsi_globals.useIndex = "anaIndex="+default_anaIndex;    	    
+	}
+	else
+	{
+	    omsi_globals.useIndex = "dataIndex="+default_dataIndex;
+	}
+	omsi_globals.qspectrum_viewerOption = 0;
+	omsi_globals.qslice_viewerOption = 0;
+
+	omsi_globals.plotpoints.push([{update:0,points:[]}]);
+	omsi_globals.imagedata.push([{update:0,image:[]}]);
+	omsi_globals.imagedata.push([{update:0,image:[]}]);
+	
+	// populate the spectrum plot attributes
+	omsi_globals.container_dimensions = {width: document.getElementById("graph1").clientWidth, height: document.getElementById("graph1").clientHeight};
+	omsi_globals.margins = {top: 10, right: 20, bottom: 40, left: 80};
+    omsi_globals.chart_dimensions = {width: omsi_globals.container_dimensions.width - omsi_globals.margins.left 
+    		- omsi_globals.margins.right, height: omsi_globals.container_dimensions.height - omsi_globals.margins.top - omsi_globals.margins.bottom};
+                  if (omsi_globals.doHilbert ==1 ){
+                  omsi_globals.chart_dimensions.width = omsi_globals.chart_dimensions.width/2;
+                  $("#hilbertGraph1").css("margin-left",omsi_globals.chart_dimensions.width+omsi_globals.margins.left+30);
+                  $("#hilbertGraph2").css("margin-left",omsi_globals.chart_dimensions.width+omsi_globals.margins.left+30);
+
+                  }
+
+
+	getFileList();
+	addListeners();
+	init(1);
+
+    var tempText = $('#flareLaunchButton').text();
+    var splitText = tempText.split(' ');
+
+    var filename = splitText[0].replace(/^.*[\\\/]/, '')
+    splitText.splice(0,1);
+    $('#flareLaunchButton').text(filename+" "+splitText.join(" "))
+   getflare("{{ default_file }}");
+
+});
+
+function init(resetPoints)
+{
+    console.log(api_root)
+	// Initialize the coordinates and populate the spectra with data:
+	// this function initializes the buttons and sets the initial position
+	// this function should run onLoad
+	// put a loading image into the divs
+
+	omsi_globals.canvas.onselectstart = function () { return false; }
+	canvas_width = $("#imageCanvas").width();
+	canvas_height = $("#imageCanvas").height();
+	omsi_globals.canvas.width = canvas_width;
+	omsi_globals.canvas.height = canvas_height;
+
+	//$("#graphs").height( omsi_globals.canvas.height + 200); //$("#body").height()
+
+	document.getElementById("graph1").innerHTML = "<h3><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Loading...</h3>";
+	document.getElementById("graph2").innerHTML = "<h3><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Loading...</h3>";
+	var ctx = omsi_globals.canvas.getContext("2d");
+	ctx.save();
+	ctx.font="bold 20px Arial";
+	ctx.fillStyle="#666";
+	ctx.fillText("Loading...", 40, 40);
+	ctx.restore();
+
+    if (omsi_globals.cacheValue == "true")
+    {
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel1Value") != null) {
+            ViewModel.channel1Value( localStorage.getItem(default_file+omsi_globals.useIndex+"channel1Value"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Value",ViewModel.channel1Value());
+        }
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel1Step") != null) {
+            ViewModel.channel1Step( localStorage.getItem(default_file+omsi_globals.useIndex+"channel1Step"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Step",ViewModel.channel1Step());
+        }
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel1Range") != null) {
+            ViewModel.channel1Range( localStorage.getItem(default_file+omsi_globals.useIndex+"channel1Range"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel1Range",ViewModel.channel1Range());
+        }
+
+
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel2Value") != null) {
+            ViewModel.channel2Value( localStorage.getItem(default_file+omsi_globals.useIndex+"channel2Value"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Value",ViewModel.channel2Value());
+        }
+
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel2Step") != null) {
+            ViewModel.channel2Step( localStorage.getItem(default_file+omsi_globals.useIndex+"channel2Step"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Step",ViewModel.channel2Step());
+        }
+
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel2Range") != null) {
+            ViewModel.channel2Range( localStorage.getItem(default_file+omsi_globals.useIndex+"channel2Range"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel2Range",ViewModel.channel2Range());
+        }
+
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel3Value") != null) {
+            ViewModel.channel3Value( localStorage.getItem(default_file+omsi_globals.useIndex+"channel3Value"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Value",ViewModel.channel3Value());
+        }
+
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel3Step") != null) {
+            ViewModel.channel3Step( localStorage.getItem(default_file+omsi_globals.useIndex+"channel3Step"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Step",ViewModel.channel3Step());
+        }
+
+        if (localStorage.getItem(default_file+omsi_globals.useIndex+"channel3Range") != null) {
+            ViewModel.channel3Range( localStorage.getItem(default_file+omsi_globals.useIndex+"channel3Range"));
+        }
+        else
+        {
+            localStorage.setItem(default_file+omsi_globals.useIndex+"channel3Range",ViewModel.channel3Range());
+        }    
+    }
+	
+
+
+	//nuke the globals
+	resetGlobals();
+	
+
+    
+	var oldp1 = omsi_globals.points[0];
+	var oldp2 = omsi_globals.points[1];	
+	
+	if (default_cursorCol1 != "" && resetPoints==1) // if there are default points, stick them in the global variable
+	{
+		omsi_globals.points = [{x:default_cursorCol1,y:default_cursorRow1},{x:default_cursorCol2,y:default_cursorRow2}];
+	}
+	else
+	{
+	    omsi_globals.points = [{x:oldp1.x,y:oldp1.y},{x:oldp2.x,y:oldp2.y}];
+	}
+    //get the m/z info for the selected file
+ 	var api_getmz = 'qmz/?file=';
+	var api_params = "&expIndex="+default_expIndex+"&"+ omsi_globals.useIndex + "&qspectrum_viewerOption=" + omsi_globals.qspectrum_viewerOption + "&qslice_viewerOption=" + omsi_globals.qslice_viewerOption;
+	var mzvec_url = api_root+api_getmz+encodeURIComponent(omsi_globals.filename)+api_params;
+	$.getJSON((mzvec_url),function(json_mzvec){
+		for (var i = 0; i<json_mzvec.values_spectra.length; i++)
+		{
+			json_mzvec.values_spectra[i] = json_mzvec.values_spectra[i].toFixed(5);	
+		}
+		omsi_globals.mzvec.valuesSpectra = json_mzvec.values_spectra.slice(0); 
+        if (json_mzvec.hasOwnProperty('values_slice') == true)
+        {
+            omsi_globals.mzvec.valuesSlice = json_mzvec.values_slice.slice(0); 		
+        }
+        else
+        {
+            omsi_globals.mzvec.valuesSlice = json_mzvec.values_spectra.slice(0); 		
+        }
+		omsi_globals.zaxisSpectrum = json_mzvec.label_spectra
+		omsi_globals.zaxisSlice = json_mzvec.label_spectra
+		if(json_mzvec.label_slice !== undefined) { omsi_globals.zaxisSlice = json_mzvec.label_slice }
+
+		
+		//TODO: also extract the mzvec fo the json_mzvec.values_slice. This should be stored in a seperate
+		//omsi_globals variabled and used any time we are dealing with the image viewer.
+		
+		// whenever a new mzvec is obtained, reset the x-range
+		omsi_globals.d3xranges =  [[0, 0],[0, 0]]; 
+		//get the spectra and image
+        get_new_spectrum(1,omsi_globals.points[0].x,omsi_globals.points[0].y); // plot 1
+        get_new_spectrum(2,omsi_globals.points[1].x,omsi_globals.points[1].y); // plot 2
+	
+		get_image_size();
+
+
+	});
+} // END INIT
+
+function resetGlobals(){
+    // omsi_globals.points = [{x:10,y:10},{x:80,y:80}];  //holds all our points
+	omsi_globals.selectedPoints = [];  //holds selected points
+    omsi_globals.translatePos = {
+        x: omsi_globals.canvas.width / 2,
+        y: omsi_globals.canvas.height / 2
+    };
+	//omsi_globals.mzmin = 0;
+	//omsi_globals.mzmax = 1000000;
+	omsi_globals.scale = 2.0;
+	omsi_globals.scaleMultiplier = 0.9;
+	// omsi_globals.brightness = 1.0;
+	// omsi_globals.brightnessMultiplier = 0.9;
+	omsi_globals.startDragOffset = {};
+	omsi_globals.startDrag = {};
+	omsi_globals.mousedown = false;
+	omsi_globals.im_width = 60;
+	omsi_globals.im_height = 60;
+	omsi_globals.pointinfo = [];
+	omsi_globals.mzvec = [{useIndex:0,valuesSlice:[],valuesSpectra:[]}];
+	omsi_globals.plotpoints = [{update:0,points:[]}];
+	omsi_globals.imagedata = [{update:0,image:[],lowPrctile:0,highPrctile:1000}];
+	omsi_globals.canvas = document.getElementById("imageCanvas");
+	omsi_globals.plotpoints.push([{update:0,points:[]}]);
+	omsi_globals.imagedata.push([{update:0,image:[]}]);
+	omsi_globals.imagedata.push([{update:0,image:[]}]);
+	omsi_globals.redPrctileMin = ViewModel.channel1MinPctile();
+	omsi_globals.redPrctileMax = ViewModel.channel1MaxPctile();
+	omsi_globals.greenPrctileMin = ViewModel.channel2MinPctile();
+	omsi_globals.greenPrctileMax = ViewModel.channel2MaxPctile();
+	omsi_globals.bluePrctileMin = ViewModel.channel3MinPctile();
+	omsi_globals.bluePrctileMax = ViewModel.channel3MaxPctile();
+	omsi_globals.channel1Value = ViewModel.channel1Value();
+	omsi_globals.channel1Range = ViewModel.channel1Range();
+	omsi_globals.channel2Value = ViewModel.channel2Value();
+	omsi_globals.channel2Range = ViewModel.channel2Range();
+	omsi_globals.channel3Value = ViewModel.channel3Value();
+	omsi_globals.channel3Range = ViewModel.channel3Range();
+	//omsi_globals.zaxisSlice = "m/z";
+    //omsi_globals.zaxisSpectrum = "m/z";
+}
+
+function get_image_size(){
+    var api_getimage = "qmz/?file=";
+    // for raw data use &expIndex=0&dataIndex=0
+    // for analysis data use &expIndex=0&anaIndex=0
+    var api_params = "&expIndex="+default_expIndex+"&"+ omsi_globals.useIndex + "&qspectrum_viewerOption=" + omsi_globals.qspectrum_viewerOption + "&qslice_viewerOption=" + omsi_globals.qslice_viewerOption + "&format=JSON";
+
+    $.getJSON((api_root+api_getimage+encodeURIComponent(omsi_globals.filename)+api_params),function(metadata){
+        // str = metadata['children'][0]['shape']
+        // str = str.replace(/\(+(.*?)\)+/g,"$1")
+        // str = str.split(',')
+        omsi_globals.im_height = metadata['values_x'].length;
+        omsi_globals.im_width = metadata['values_y'].length;
+        console.log('height = ' + omsi_globals.im_height )
+        console.log('width = ' + omsi_globals.im_width )
+        omsi_globals.imagedata[0].image = Create2DArray(omsi_globals.im_width,omsi_globals.im_height,0);
+        omsi_globals.imagedata[1].image = Create2DArray(omsi_globals.im_width,omsi_globals.im_height,0);
+        omsi_globals.imagedata[2].image = Create2DArray(omsi_globals.im_width,omsi_globals.im_height,0);
+        weAreAllSet = 1;
+        get_image_files();
+        draw()
+    })
+}
+
+function Create2DArray(cols,rows, val) {
+  var arr = [];
+  for (var i=0;i<rows;i++) {
+    arr[i] = [];
+    for (var j=0;j<cols;j++) {
+         arr[i][j] = val;
+        }
+    }
+  return arr;
+}
+
+
+
+function get_image_files(){
+    // get_image_size();
+	var api_getimage = "qslice/?file=";
+	// for raw data use &expIndex=0&dataIndex=0
+	// for analysis data use &expIndex=0&anaIndex=0
+	var api_params = "&expIndex="+default_expIndex+"&"+ omsi_globals.useIndex + "&qspectrum_viewerOption=" + omsi_globals.qspectrum_viewerOption + "&qslice_viewerOption=" + omsi_globals.qslice_viewerOption + "&format=JSON";
+	var api_z1 = get_api_z(ViewModel.channel1Value(), ViewModel.channel1Range());
+	var api_z2 = get_api_z(ViewModel.channel2Value(), ViewModel.channel2Range());
+	var api_z3 = get_api_z(ViewModel.channel3Value(), ViewModel.channel3Range());
+    var api_operations1 = '&operations=[{"min_dim":2,"reduction":"max","axis":-1},{"x2":{"q":'+ViewModel["channel"+(0+1)+"MinPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"operation":"subtract","axes":null,"transformation":"arithmetic"},{"x2":{"dtype":"float","x1":{"q":'+ViewModel["channel"+(0+1)+"MaxPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"axes":null,"transformation":"astype"},"operation":"divide","axes":null,"transformation":"arithmetic"},{"operation":"clip","axes":null,"a_max":1,"transformation":"scale","a_min":0}]';
+    var api_operations2 = '&operations=[{"min_dim":2,"reduction":"max","axis":-1},{"x2":{"q":'+ViewModel["channel"+(1+1)+"MinPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"operation":"subtract","axes":null,"transformation":"arithmetic"},{"x2":{"dtype":"float","x1":{"q":'+ViewModel["channel"+(1+1)+"MaxPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"axes":null,"transformation":"astype"},"operation":"divide","axes":null,"transformation":"arithmetic"},{"operation":"clip","axes":null,"a_max":1,"transformation":"scale","a_min":0}]';
+    var api_operations3 = '&operations=[{"min_dim":2,"reduction":"max","axis":-1},{"x2":{"q":'+ViewModel["channel"+(2+1)+"MinPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"operation":"subtract","axes":null,"transformation":"arithmetic"},{"x2":{"dtype":"float","x1":{"q":'+ViewModel["channel"+(2+1)+"MaxPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"axes":null,"transformation":"astype"},"operation":"divide","axes":null,"transformation":"arithmetic"},{"operation":"clip","axes":null,"a_max":1,"transformation":"scale","a_min":0}]';
+    
+	$.getJSON((api_root+api_getimage+encodeURIComponent(omsi_globals.filename)+api_params+api_operations1+api_z1),function(json_imageR){
+		omsi_globals.imagedata[0].image = json_imageR;
+        draw();})
+        .fail(function(jqXHR, textStatus, errorThrown) { 
+            console.log('Red getJSON request failed! ' + textStatus +  " " + errorThrown); });
+
+	$.getJSON((api_root+api_getimage+encodeURIComponent(omsi_globals.filename)+api_params+api_operations2+api_z2),
+        function(json_imageG){
+    		omsi_globals.imagedata[1].image = json_imageG;
+            draw();})
+        .fail(function(jqXHR, textStatus, errorThrown) { 
+            console.log('Green getJSON request failed! ' + textStatus + " " + errorThrown); });
+			
+    $.getJSON((api_root+api_getimage+encodeURIComponent(omsi_globals.filename)+api_params+api_operations3+api_z3),function(json_imageB){
+		omsi_globals.imagedata[2].image = json_imageB;
+        draw();	})
+        .fail(function(jqXHR, textStatus, errorThrown) { 
+            console.log('Blue getJSON request failed! ' + textStatus +  " " + errorThrown); });
+}
+
+function get_new_channel(channel, channelVal, channelTol){
+	var api_getimage = "qslice/?file=";
+	var api_params = "&expIndex="+default_expIndex+"&"+ omsi_globals.useIndex + "&qspectrum_viewerOption=" + omsi_globals.qspectrum_viewerOption + "&qslice_viewerOption=" + omsi_globals.qslice_viewerOption  + "&format=JSON";//?normalize=1
+    var api_operations = '&operations=[{"min_dim":2,"reduction":"max","axis":-1},{"x2":{"q":'+ViewModel["channel"+(channel+1)+"MinPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"operation":"subtract","axes":null,"transformation":"arithmetic"},{"x2":{"dtype":"float","x1":{"q":'+ViewModel["channel"+(channel+1)+"MaxPctile"]()+',"reduction":"percentile","x1":{"reduction":"select_values","selection":{"x2":0,"operation":"greater","axes":null,"transformation":"arithmetic"}}},"axes":null,"transformation":"astype"},"operation":"divide","axes":null,"transformation":"arithmetic"},{"operation":"clip","axes":null,"a_max":1,"transformation":"scale","a_min":0}]';
+	var elements_list = ['redinput', 'greeninput', 'blueinput'];
+	var api_z = get_api_z(channelVal, channelTol);
+	$.getJSON((api_root+api_getimage+encodeURIComponent(omsi_globals.filename)+api_params+api_operations+api_z),function(json_imageX){
+		omsi_globals.imagedata[channel].image = json_imageX;
+		draw();
+	})
+    .fail(function(jqXHR, textStatus, errorThrown) { 
+                omsi_globals.imagedata[channel].image = Create2DArray(omsi_globals.im_width,omsi_globals.im_height,0);
+                draw();
+                console.log('New getJSON request failed! ' + textStatus +  " " + errorThrown); });
+}
+
+function get_api_z(api_mz, api_tol){
+	var temp1 = getNearestNumber(omsi_globals.mzvec.valuesSlice,Number(api_mz)-Number(api_tol));
+	var temp2 = getNearestNumber(omsi_globals.mzvec.valuesSlice,Number(api_mz)+Number(api_tol));
+	
+	var api_z = "&mz=" + temp1 +":";
+	if (temp1 == temp2)
+	{
+		api_z = api_z + (Number(temp1) + 1);
+	}
+	else
+	{
+		api_z = api_z + temp2;
+	}
+	return api_z;	
+}
+
+
+
+function get_new_spectrum(point_num,api_x,api_y)
+{
+	// this function calls the api for data and sends that data to the plotting functions
+	// INPUTS:
+	//    point_num = the pointer selected and tells which graph to draw on
+	//    fileName = which file in the database to query from
+	//    api_x = the x-position of the pointer. I.e., the column index.
+	//    api_y = the y-position of the pointer. I.e., the row index.
+	//
+	// this function typically calls the plotting function inside the asynchronous getJSON commands 
+	//
+	// if a new session or filename is instanciated, two calls will be made: one for the mz-vector and one for peaks
+	// if only a new position is selected, the mz-vector will be loaded from session storage. 
+	//
+	// setup a blocker to keep repeated calls from going out
+	omsi_globals.pointinfo[point_num-1] = omsi_globals.filename + api_x + api_y;		
+	//
+	var api_getspectrum = "qspectrum/?file=";
+	var api_opt1 =  "&expIndex="+default_expIndex+"&" + omsi_globals.useIndex + "&qspectrum_viewerOption=" + omsi_globals.qspectrum_viewerOption + "&qslice_viewerOption=" + omsi_globals.qslice_viewerOption;
+	var api_opt2 = "&findPeaks=0&format=JSON";
+	var spectrum_url = api_root+api_getspectrum+encodeURIComponent(omsi_globals.filename)+api_opt1+"&col=["+api_x+"]&row=["+api_y+"]"+api_opt2;
+	$.getJSON((spectrum_url),function(json_spectrum){
+		sendToPlotting(point_num,json_spectrum);
+	});
+    if (omsi_globals.doHilbert==1)
+    {
+        
+        hilSpecURL = api_root+api_getspectrum+encodeURIComponent(omsi_globals.filename)+api_opt1+"&col=["+api_x+"]&row=["+api_y+"]"+"&format=PNG&layout=hilbert";
+        var myHeight = omsi_globals.chart_dimensions.height+omsi_globals.margins.top+omsi_globals.margins.bottom;
+        var img = $("<img style='height:"+myHeight+"px;'/>").attr('src', hilSpecURL)
+        .load(function() {
+              if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+              alert('broken image!');
+              } else {
+              $("#hilbertGraph"+point_num).html(img);
+              }
+              });
+              
+              
+            }
+}
+
+function sendToPlotting(point_num,json_spectrum)
+{
+	//
+	// this function builds a datastructure and sends to draw_spectrum
+	// this function should be called on a change in the coordinates of either point
+	// INPUTS:
+	//     point_num = the div which should get the plot (ie "1" for point1 and "2" for point2)
+	//     json_mzvec = the json structure returned from the API for the mz data
+	//     json_spectrum = the json structure returned from the API for the peaks and raw spectrum
+	//
+	// This function should work for "N" points
+	// The downsampling value "50" is arbitrary and should be scaled to the range of the data
+	//
+	// if m/z values are required use spectrum_mz it will be included in the json object.
+	// if it isn't needed and you can use the global mz-vec it won't be included.
+	var points = []; // the raw data
+	var newpoints = []; // downsampled data
+	var peaks = []; // peaks returned by API
+    // console.log(omsi_globals.mzvec.valuesSpectra.length)
+	for (var i = 0; i<omsi_globals.mzvec.valuesSpectra.length; i++)
+	{	
+		points.push({x:Number(omsi_globals.mzvec.valuesSpectra[i]),y:Number(json_spectrum.spectrum[0][i])}); //push the remaining values into the array
+	}
+	var L = 100000;
+	var myDown = 30;
+	
+	if($.browser.mozilla){
+	    while(L>7500)
+    	{
+        	newpoints = simplify(points,myDown);// need to make this scale with range of data
+        	L = newpoints.length;
+            // console.log(point_num + " length is: " + L)
+        	myDown = myDown*1.3;
+        }
+	}else{
+	    while(L>10000)
+    	{
+        	newpoints = simplify(points,myDown);// need to make this scale with range of data
+        	L = newpoints.length;
+            // console.log(point_num + " length is: " + L)
+        	myDown = myDown*1.3;
+        }
+	}
+	
+	// for (var i = 0; i<json_spectrum.peak_value.length; i++)
+	// 	{
+	// 		peaks.push({x:json_mzvec.values_spectra[json_spectrum.peak_mz[i]],y:json_spectrum.spectrum[json_spectrum.peak_mz[i]]}); 
+	// 	}
+
+
+	omsi_globals.plotpoints[point_num-1].raw = points;
+	omsi_globals.plotpoints[point_num-1].downsampled = newpoints;
+	// omsi_globals.plotpoints[point_num-1].peaks = peaks;
+	
+	//for initial load, use the full range of values without filtering to the range
+	if(omsi_globals.d3xranges[point_num-1][1] == 0){
+		omsi_globals.d3data[point_num-1] = newpoints; //make the downsampled data the current set for plotting
+		omsi_globals.d3xranges[point_num-1] = [points[0].x, points[points.length-1].x];
+		omsi_globals.d3iranges[point_num-1] = [0, newpoints.length-1];
+	}
+	else{
+		var curr_range = omsi_globals.d3xranges[point_num-1];
+		var xmax = curr_range[1];
+		var xmin = curr_range[0]; 
+		var sourcedata;
+		//filter the data to the scale already in place
+		if(xmax - xmin < omsi_globals.threshold){
+			sourcedata = points; 
+		}
+		else sourcedata = newpoints;
+		var filtereddata = [];
+		for(i = 0; i < sourcedata.length; i++){
+			if(sourcedata[i].x >= xmin && sourcedata[i].x <= xmax) filtereddata.push(sourcedata[i]);
+		}
+		omsi_globals.d3data[point_num-1] = filtereddata;
+	}
+    // console.log(omsi_globals.d3xranges[point_num-1][0])
+    // ViewModel.manRangeMin(omsi_globals.d3xranges[point_num-1][0]);
+    // ViewModel.manRangeMax(omsi_globals.d3xranges[point_num-1][1]);
+    draw_spectrum(point_num);
+
+}
+
+
+function pageToImgCoord(canvas, pagepoint){
+	return {
+		x: Math.round((pagepoint.x - getLeft(canvas) - omsi_globals.translatePos.x) / omsi_globals.scale + omsi_globals.im_width/2), // make 250 the image width in pixels
+		y: Math.round((pagepoint.y - getTop(canvas) - omsi_globals.translatePos.y) / omsi_globals.scale + omsi_globals.im_height/2) // make 160 the image height in pixels
+	}
+}
+
+function get1DArray(arr){
+
+    var result = new Array();
+
+    for (var x = 0; x < arr.length; x++){
+        for (var y = 0; y < arr[x].length; y++){
+
+        result.push(arr[x][y])
+
+        }
+    }
+
+    return result
+}
+
+
+function draw(){
+    // The command: "putImageData" doesn't support normal HTML5 canvas commands.  
+    // so we putImageData to a ghost canvas and then pop the ghost canvas onto the real canvas
+    var ctx = omsi_globals.canvas.getContext("2d");
+    // canvas.width is a weird entity.
+    // it seems to not really update the #pixels until you do this
+    // without the following code: canas.width and canvas.height are the default values
+    canvas_width = $("#imageCanvas").width();
+    canvas_height = $("#imageCanvas").height();
+//    var canvasData = ctx.createImageData(canvas_width,canvas_height);
+    var canvasData = ctx.createImageData(omsi_globals.im_width,omsi_globals.im_height);
+
+    var inMemoryCanvas = document.createElement("canvas");
+//    inMemoryCanvas.width = canvas_width;
+//    inMemoryCanvas.height = canvas_height;
+    inMemoryCanvas.width = omsi_globals.im_width;
+    inMemoryCanvas.height = omsi_globals.im_height;
+    var inMemCtx = inMemoryCanvas.getContext("2d");
+
+    var idx = 0;
+    var temp = 0;
+
+    if ($('#redCheckBox').bootstrapSwitch('status') == true) {
+        for (var x = 0; x < omsi_globals.im_width; x++)  {
+            for (var y = 0; y < omsi_globals.im_height; y++)  {
+                // Index of the pixel in the array
+                idx = (x + y * omsi_globals.im_width) * 4;
+                // Update the values of the pixel;
+                temp = omsi_globals.imagedata[0].image[y][x];///immax[0]*255;
+                canvasData.data[idx + 0] = temp * 255;
+                canvasData.data[idx + 3] = 255;
+                }
+            }
+        }
+        
+       if ($('#greenCheckBox').bootstrapSwitch('status') == true) {    
+        for (var x = 0; x < omsi_globals.im_width; x++)  {
+            for (var y = 0; y < omsi_globals.im_height; y++)  {
+                // Index of the pixel in the array
+                idx = (x + y * omsi_globals.im_width) * 4;
+                temp = omsi_globals.imagedata[1].image[y][x];///immax[0]*255;
+                canvasData.data[idx + 1] = temp * 255;
+                canvasData.data[idx + 3] = 255;
+                }
+            }
+        }
+        if ($('#blueCheckBox').bootstrapSwitch('status') == true) {
+        for (var x = 0; x < omsi_globals.im_width; x++)  {
+            for (var y = 0; y < omsi_globals.im_height; y++)  {
+                // Index of the pixel in the array
+                idx = (x + y * omsi_globals.im_width) * 4;
+                temp = omsi_globals.imagedata[2].image[y][x];///immax[0]*255;
+                canvasData.data[idx + 2] = temp * 255;
+                canvasData.data[idx + 3] = 255;
+                }
+            }
+        }
+     
+        
+        
+        // put image data into ghost canvas	
+        inMemCtx.putImageData(canvasData, 0, 0);
+        ctx.clearRect(0, 0, Math.max(canvas_width,omsi_globals.im_width), Math.max(canvas_height,omsi_globals.im_height));
+        ctx.save();
+        ctx.translate(omsi_globals.translatePos.x, omsi_globals.translatePos.y);
+        // my best guess as to what is happening is that the image is being drawn and part of it is off canvas.  When it pops back to the center of canvas, part of the image is missing.
+        ctx.scale(omsi_globals.scale, omsi_globals.scale); // this doesn't seem to do anything
+        ctx.drawImage(inMemoryCanvas, -(omsi_globals.im_width/2), -(omsi_globals.im_height/2));//, canvas_width, canvas_height);
+
+        // ctx.drawImage(inMemoryCanvas, 0, 0, omsi_globals.im_width, omsi_globals.im_heigth);
+        for(i=0; i<omsi_globals.points.length; i++){
+            drawCrosshair(ctx, omsi_globals.points[i]);
+        }
+        for(i=0; i<omsi_globals.points.length; i++){
+            if (omsi_globals.dragindex == i){
+                labelCrosshair(ctx, omsi_globals.points[i],i+1);
+            }
+        }
+        for(i=0; i<omsi_globals.points.length; i++){
+            if (omsi_globals.dragindex == i){
+                drawSelection(ctx, omsi_globals.points[i]);
+            }
+        }
+
+    ctx.restore();
+
+}
+
+function labelCrosshair(context, point,pointnum) {
+	var adjusted = {
+		x: point.x - (omsi_globals.im_width/2), // make 250 the image width in pixels
+		y: point.y - (omsi_globals.im_height/2) // make 160 the image height in pixels
+
+	};
+
+	// context.strokeRect(adjustedx,adjustedy,shape.w,shape.h);
+    var width = 1.5/omsi_globals.scale;
+    var fontSize = Math.round(16/omsi_globals.scale);
+    var offSet = 8 / omsi_globals.scale;
+	context.shadowColor = '000000';
+    context.shadowBlur = 1;
+    context.shadowOffsetX = 1;
+    context.shadowOffsetY = 1;
+	context.lineWidth=width;
+	context.fillStyle="#eeeeee";//"red";
+	context.strokeStyle="#eeeeee";
+	var str = "bold " + fontSize + "px sans-serif";
+	context.font= str;
+	context.fillText("Point #" + pointnum, adjusted.x+offSet, adjusted.y-offSet);
+}
+
+function drawCrosshair(context, point) {
+	
+	var adjusted = {
+		x: point.x - (omsi_globals.im_width/2), // make 250 the image width in pixels
+		y: point.y - (omsi_globals.im_height/2) // make 160 the image height in pixels
+
+	};
+	// context.strokeRect(adjustedx,adjustedy,shape.w,shape.h);
+//    var width = (1.5/omsi_globals.scale*2);
+    var width = 3/omsi_globals.scale;
+    var length = 16/omsi_globals.scale;
+//    if (qidth < 2){
+
+//        	var width = (1.5/2*2);
+
+//    }
+//    else {
+
+
+//    }
+
+	context.lineWidth = width;
+	context.strokeStyle = "#eeeeee";
+	context.beginPath();
+	context.moveTo(adjusted.x,adjusted.y-length);
+	context.lineTo(adjusted.x,adjusted.y-1);
+	context.moveTo(adjusted.x,adjusted.y+1);
+	context.lineTo(adjusted.x,adjusted.y+length);
+	context.moveTo(adjusted.x-length,adjusted.y);
+	context.lineTo(adjusted.x-1,adjusted.y);
+	context.moveTo(adjusted.x+1,adjusted.y);
+	context.lineTo(adjusted.x+length,adjusted.y);
+	context.stroke();
+
+}
+
+function drawSelection(context, point){
+	var adjusted = {
+		x: point.x - (omsi_globals.im_width/2), 
+		y: point.y - (omsi_globals.im_height/2)  
+	};
+    var width = 3/omsi_globals.scale;
+    var length = 16/omsi_globals.scale*0.8;
+
+	context.shadowColor = 'transparent';
+	context.lineWidth = width;
+	context.beginPath();
+	context.arc(adjusted.x, adjusted.y, length, 0, 2 * Math.PI, false);
+	context.lineWidth = width;
+	context.strokeStyle = "#eeeeee";
+	context.stroke();
+	updateCoords();
+}
+	
+
+
+// this needs to be changed so that it doesn't loop through all the points.  Just do it for the point whose coordinates have changed
+function updateCoords(){
+	var coordstring1 = "";
+	var coordstring2 = "";
+	coordstring1 += "Point #1: " + omsi_globals.points[0].x + ", " + omsi_globals.points[0].y + "<br />";
+	coordstring2 += "Point #2: " + omsi_globals.points[1].x + ", " + omsi_globals.points[1].y + "<br />";
+	$('#graph1head').html(coordstring1);
+	$('#graph2head').html(coordstring2);
+	
+	for(i=0; i<omsi_globals.points.length; i++){
+		if (omsi_globals.mousedown == false)
+		{
+			if (omsi_globals.pointinfo[i] != omsi_globals.filename + omsi_globals.points[i].y + omsi_globals.points[i].x)
+			{
+				get_new_spectrum(i+1,omsi_globals.points[i].x,omsi_globals.points[i].y);				
+			}		
+		}		
+	}
+}
+
+//Find the position of an element on the page relative to the body.
+function getLeft(element){
+	var left = element.offsetLeft;
+	while(element = element.offsetParent){
+		left += element.offsetLeft;
+	}
+	return left;
+}
+function getTop(element){
+	var top = element.offsetTop;
+	while(element = element.offsetParent){
+		top += element.offsetTop;
+	}
+	return top;
+}
+
+
+function getNearestNumber(a, n){
+    if((l = a.length) < 2)
+    return l - 1;
+    for(var l, p = Math.abs(a[--l] - n); l--;)
+    if(p < (p = Math.abs(a[l] - n)))
+    break;
+    return l + 1;
+}
+
+(function($,sr){
+
+  // debouncing function from John Hann
+  // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+  // prevents bogging down when resizing the browser window
+  var debounce = function (func, threshold, execAsap) {
+      var timeout;
+
+      return function debounced () {
+          var obj = this, args = arguments;
+          function delayed () {
+              if (!execAsap)
+                  func.apply(obj, args);
+              timeout = null;
+          };
+
+          if (timeout)
+              clearTimeout(timeout);
+          else if (execAsap)
+              func.apply(obj, args);
+
+          timeout = setTimeout(delayed, threshold || 500);
+      };
+  }
+  // smartresize 
+  jQuery.fn[sr] = function(fn){  return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
+
+})(jQuery,'smartresize');
+
+$(window).smartresize(function(){
+	var canvaswidth, canvasheight;
+	console.log($(window).width())
+    if(window.innerWidth > 767){
+        canvasheight = 0.67*$(window).height();
+        canvaswidth = $(window).width()*0.345;
+       }
+       else{
+        canvaswidth =$(window).width()*0.95 ;
+        canvasheight = omsi_globals.im_height * omsi_globals.scale + 20;
+       }
+       // $('#imageCanvas').height(0.7*$(window).height()).width($(window).width()*0.395);
+
+	$('#imageCanvas').height(canvasheight).width(canvaswidth);
+	omsi_globals.canvas.width = canvaswidth;
+	omsi_globals.canvas.height = canvasheight;
+    if(omsi_globals.imagedata[2].image){ //do this only if we have the image data
+	    	draw();
+		omsi_globals.container_dimensions = {width: document.getElementById("graph1").clientWidth, height: document.getElementById("graph1").clientHeight};
+	    omsi_globals.chart_dimensions = {width: omsi_globals.container_dimensions.width - omsi_globals.margins.left - omsi_globals.margins.right, height: omsi_globals.container_dimensions.height - omsi_globals.margins.top - omsi_globals.margins.bottom};
+      if (omsi_globals.doHilbert ==1 )
+      {
+         omsi_globals.chart_dimensions.width = omsi_globals.chart_dimensions.width/2;
+         $("#hilbertGraph1").css("margin-left",omsi_globals.chart_dimensions.width+omsi_globals.margins.left+30);
+                      $("#hilbertGraph2").css("margin-left",omsi_globals.chart_dimensions.width+omsi_globals.margins.left+30);
+
+      }
+      draw_spectrum(1);
+      draw_spectrum(2);
+    }
+});
+
+
+function hasPageBeenResized() {
+	var isResized;
+
+	function mediaQueryMatches(property, r) {
+		var styles = document.createElement('style');
+		document.getElementsByTagName("head")[0].appendChild(styles);
+
+		var dummyElement = document.createElement('div');
+		dummyElement.innerHTML="test";
+		dummyElement.id="mq_dummyElement";
+		document.body.appendChild(dummyElement);
+
+		styles.sheet.insertRule('@media('+property+':'+r+'){#mq_dummyElement{text-decoration:underline}}', 0);
+		var matched = getComputedStyle(dummyElement, null).textDecoration == 'underline';
+		styles.sheet.deleteRule(0);
+		document.body.removeChild(dummyElement);
+		document.getElementsByTagName("head")[0].removeChild(styles);
+		return matched;
+	};
+
+	function mediaQueryBinarySearch(property, unit, a, b, maxIter, epsilon) {
+		var mid = (a + b)/2;
+		if (maxIter == 0 || b - a < epsilon) return mid;
+		if (mediaQueryMatches(property, mid + unit)) {
+			return mediaQueryBinarySearch(property, unit, mid, b, maxIter-1, epsilon);
+		} else {
+			return mediaQueryBinarySearch(property, unit, a, mid, maxIter-1, epsilon);
+		}
+	};
+
+	if($.browser.msie){
+		if($.browser.version==7){
+			//IE7
+			var r = document.body.getBoundingClientRect();
+			isResized = ((r.right-r.left)/document.body.offsetWidth)!==1;
+		}else if($.browser.version==8){
+			//IE 8
+			isResized= (screen.deviceXDPI / screen.logicalXDPI)!==1;
+		}else if($.browser.version>=9){
+			//IE9+
+			isResized=(screen.deviceXDPI / screen.systemXDPI)!==1;
+		}
+	}else if($.browser.webkit){
+		//Webkit
+		var documentWidthCss = Math.max(
+			document.documentElement.clientWidth,
+			document.documentElement.scrollWidth,
+			document.documentElement.offsetWidth
+		);
+		isResized=(document.width / documentWidthCss)!==1;
+	}else if($.browser.opera){
+		//Opera - No good way to detect :(
+		
+	}else if($.browser.mozilla){
+		if($.browser.version > "1.9.1" && $.browser.version < "1.9.2"){
+			//Firefox 3.5 only
+			isResized=(screen.width / mediaQueryBinarySearch('min-device-width', 'px', 0, 6000, 20, .0001))!==1;
+		}else if(parseFloat($.browser.version)>=4){
+			//Firefox 4+
+			isResized=(Math.round(1000 * mediaQueryBinarySearch('min--moz-device-pixel-ratio','', 0, 10, 20, .0001)) / 1000)!==1;
+		}else{
+			//Firefox 3.6 and lower than 3.5 - No good way to detect :(
+		}
+	}
+	if (isResized){
+        // $('#resetZoom_modal').modal('show');
+	}else{
+        $('#resetZoom_modal').modal('hide')
+	}
+    return isResized;
+};
+
+</script>
+{% endblock %}
+

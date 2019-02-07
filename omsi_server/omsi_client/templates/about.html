@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style type="text/css">
+
+
+
+</style>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-39099473-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- OpenMSI (2).png: looks fine to me, we just need to add the individual content. If we want we could optionally add a "What is OpenMSI" section to the bottom of this page in which we could elaborate in more detail on the vision of OpenMSI (think of something along the lines of a press release). This would allow us to keep the main page very compact and link to this page for more details. I would call this page the About page in the menu. -->
+
+<div class="container" >
+    <h1 style="text-align:center;">Project Leadership </h1>
+    <hr>
+    <div class="row-fluid">
+        <div class="span6" >
+            <h3 style="text-align:left;">Ben Bowen</h3>
+            <p><img src="{{ STATIC_URL }}images/people/BenBowen.jpg" style="float:left;margin:5px 5px 5px 5px;" >
+                <p><strong>Application Lead: </strong>In the Environmental Genomics and Systems Biology (EGSB) Division of Berkeley Lab, Ben is the Applications Lead for OpenMSI.  He has over 10 years experience in mass spectrometry and quantitative analysis.  With a background in chemical engineering and a biophysics PhD in multiparameter imaging of single-molecule fluorescence he has gone on to establish new paradigms in proteomics, metabolomics, and imaging.</p>
+                <p>Leading OpenMSI is a long-standing vision of Ben's where the power of web-based technologies allows the most advanced analysis, management, and visualization of one of the most promising technical approaches emerging into the biological laboratories.</p></p>
+        </div>
+        <div class="span6">
+            <h3 style="text-align:left;">Oliver Rübel</h3>
+            <p><img src="{{ STATIC_URL }}images/people/OliverRuebel.jpg" style="float:left;margin:5px 5px 5px 5px;" >
+                <p><strong>Computing Lead: </strong>Oliver is a research scientist of Berkeley Lab's Data Analytics and Visualization Group and a member of the NERSC Analytics team. He received his Ph.D. in Computer Science in 2009 from the University of Kaiserslautern, Germany. His research has focused on high-performance data analysis and visualization, machine learning, and query-driven visualization of multi-dimensional scientific data. During his career, Oliver has worked closely with applications ranging from high-energy physics, climate science, to biological sciences. He has contributed to the development of many visualization and analysis codes and has been a main developer of <a href="http://bdtnp.lbl.gov/Fly-Net/bioimaging.jsp?w=pcx">PointCloudXplore</a> . With OpenMSI he continues his journey to make complex data accessible to application sciences. For more information about Oliver see <a href="http://vis.lbl.gov/~oruebel/" target="_blank">here</a> </p></p>
+        </div>
+    </div>
+    <br>
+    <br>
+    <h1 style="text-align:center;">Development Team</h1>
+    <hr>
+    <div class="row-fluid">
+        <div class="span4" >
+            <h3 style="text-align:left;">Curt Fischer</h3>
+            <p><img src="{{ STATIC_URL }}images/people/CurtFischer.jpg" style="float:left;margin:5px 5px 5px 5px;" >
+                <p><strong>Senior Developer: </strong>Curt studied chemical engineering as an undergrad at Case Western Reserve University and as a Ph.D. student at MIT. His doctoral thesis, explored experimental approaches to optimizing metabolic pathways for microbial hydrocarbon and biofuel production. From 2009 to 2010 he was a post-doctoral scholar at UC Berkeley, where he studied natural microbial communities using a combination of -omics approaches. From 2011-2014, he worked as a Biological Engineer at startup company Ginkgo Bioworks, where he led projects enabling bacteria to convert CO2 to fuels, helped expand the company's organism testing and characterization pipeline, and translated client needs into biological specifications. In 2015 he joined the OpenMSI team.</p></p>
+        </div>
+        <div class="span4" >
+            <h3 style="text-align:left;">Annette M. Greiner </h3>
+            <p><img src="{{ STATIC_URL }}images/people/AnnetteGreiner.jpg" style="float:left;margin:5px 5px 5px 5px;" >
+                <p><strong>Senior Developer: </strong>Annette Greiner is a user interface designer and web developer with particular interest in interaction design and visualization. She recently earned a Master's in Information Management and Systems from UC Berkeley's School of Information, with a focus on human-computer interaction. Before returning to school, she developed web sites for the Advanced Light Source and the DOE Joint Genome Institute. At NERSC, she designs and develops science gateways. Annette holds a B.S. in biomedical science and theater from the University of Michigan.</p></p>
+        </div>
+        <div class="span4">
+            <h3 style="text-align:left;">Shreyas Cholia</h3>
+            <p><img src="{{ STATIC_URL }}images/people/ShreyasCholia.jpg" style="float:left;margin:5px 5px 5px 5px;" >
+                <p><strong>Senior Developer: </strong>Shreyas Cholia works on science gateway, web and grid technologies for NERSC, with the goal of making high-performance and distributed computing more transparent and accessible. He has also been involved in various grid and data-driven science efforts at NERSC since 2002. Prior to his appointment at NERSC, Shreyas was a developer and consultant at IBM.  He has a bachelor's degree from Rice University, where he double majored in Computer Science and Cognitive Sciences.</p></p>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <h1 style="text-align:center;">OpenMSI Advisory Board</h1>
+    <hr>
+    <div class="row-fluid">
+        <div class="span3" >
+            <h3 style="text-align:left;">Katherine Yelick</h2>
+                <p><img src="{{ STATIC_URL }}images/people/KathyYelick.jpg" style="float:left;margin:2px 2px 2px 2px;" >
+                    <p><a href="http://www.cs.berkeley.edu/~yelick/">Katherine Yelick</a> is a Professor of Electrical Engineering and Computer Sciences at the University of California at Berkeley and is also the Associate Laboratory Director of Computing Sciences at Lawrence Berkeley National Laboratory.
+                    </p></p>
+                    </div>
+        <div class="span3">
+            <h3 style="text-align:left;">Gary Karpen</h2>
+                <p><img src="{{ STATIC_URL }}images/people/GaryKarpen.jpg" style="float:left;margin:2px 2px 2px 2px;" >
+                    <p><a \href="http://www.lbl.gov/lsd/People_&_Organization/Scientific_Staff_Directory/Karpen_Lab.html">Gary Karpen</a> is an Adjunct Professor with the Department of Molecular and Cell Biology at the University of California at Berkeley and is also the Division Director of the Life Sciences Division at Lawrence Berkeley National Laboratory</p></p>
+                    </div>
+        <div class="span3" >
+            <h3 style="text-align:left;">Trent Northen</h2>
+            <p><img src="{{ STATIC_URL }}images/people/TrentNorthen.jpg" style="float:left;margin:2px 2px 2px 2px;" >
+                <p> <a href="http://www.lbl.gov/lsd/People_&_Organization/Scientific_Staff_Directory/Northen_Lab.html">Trent Northen</a> is a Staff Scientist at Lawrence Berkeley National Laboratory (LBNL) and lead of the Molecular Cartography Project at LBNL.</p></p>
+        </div>
+        <div class="span3">
+            <h3 style="text-align:left;">David Skinner</h2>
+                <p><img src="{{ STATIC_URL }}images/people/DavidSkinner.jpg" style="float:left;margin:2px 2px 2px 2px;" >
+                    <p><a href="http://www.nersc.gov/about/nersc-staff/outreach-software-and-programming-group/david-skinner/">David Skinner</a> is Group Lead of the Outreach, Software and Programming Group at the National Energy Scientific Computing Center (NERSC).
+                    </p></p>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span3" >
+            <h3 style="text-align:left;">Wes Bethel</h2>
+                <p><img src="{{ STATIC_URL }}images/people/WesBethel.jpg" width="107" height="150" style="float:left;margin:2px 2px 2px 2px;" >
+                    <p><a href="http://vis.lbl.gov/~wes/"l>Wes Bethel</a> is the Group Lead of the Visualization Group at Lawrence Berkeley National Laboratory.</p></p>
+        </div>
+        <div class="span3">
+            <h3 style="text-align:left;">Ken Joy</h2>
+                <p><img src="{{ STATIC_URL }}images/people/KenJoy.jpg" style="float:left;margin:2px 2px 2px 2px;" >
+                    <p><a href="http://www.idav.ucdavis.edu/people/profile?pid=7">Ken Joy</a> is a Professor in the Computer Science Department at the University of California at Davis.
+                       He is the Director of the Institute for Data Analysis and Visualization (IDAV) at UC Davis. </p></p>
+        </div>
+    </div>
+    <br>
+    <br>
+    <hr style="border: 2px solid #888;">
+    <h1 style="text-align:left;">Overview</h1>
+    <a href="http://pubs.acs.org/doi/abs/10.1021/ac402540a" target="_blank"><img src="{{ STATIC_URL }}images/publications/openmsi_acs_2013.png" style="float:left;margin:5px 5px 5px 5px;" width="300px" ></a>
+    <p><b>Specific Goal:</b> To make the most high-performance, advanced data management, model building, analysis and visualization resources for mass spectrometry imaging accessible to scientists via the web.</p>
+
+    <p><b>Project summary:</b> The development and application of cutting-edge analytical methods is a core driver for new scientific discoveries, medical diagnostics, and commercial-innovation.  Mass spectrometry imaging (MSI) holds the promise for being a transformative technology for advanced studies of metabolic processes with broad applications in life sciences, bioenergy, and health. MSI enables fast assays of microbial metabolism essential in bioengineering problems common to the development of biofuels, drugs, and diagnostics for cancer and other diseases. While the data can be routinely collected, the broad application of MSI is currently limited by the lack of easily accessible analysis methods that can process data of the size, volume, diversity and complexity generated by MSI experiments.  Typically individuals that can both develop quality computer software and also understand the biological and technical issues associated with each experiment are required to help even with common, and what ought to be routine analyses. Furthermore, the expert developer is often handicapped due to a lack of standards in data-format, algorithms, and visualization strategies. This is an unfortunate situation in which well-designed experiments have to wait in the queue (often for weeks or month) until someone is available to help with the analysis, in which experiments are not completed due to delayed detection of errors, and in which advanced, large-scale experiments are not performed due to the lack of essential analysis capabilities. Analysis of MSI data is an unsolved big data problem that slows down and prevents high-impact scientific discoveries.</p>
+
+    <div class="container" ><img src="{{ STATIC_URL }}images/about/nersc_openmsi_infrastructure.png" style="float:left;margin:2px 2px 2px 2px;" width="50%" >
+       <b>Advanced, high-performance computing:</b> OpenMSI uses the advanced, high-performance compute resources of the National Energy Research Scientific Computing Center (NERSC) to make advanced mass spectrometry imaging accessible. The combination of advanced software solutions and state-of-the-art computing are what makes OpenMSI possible.
+    </div>
+
+    <br>
+
+    <hr style="border: 2px solid #888;">
+    <h2>Citing OpenMSI</h2>
+    <p>Oliver Rübel, Annette Greiner, Shreyas Cholia, Katherine Louie, E. Wes Bethel, Trent R. Northen, and Benjamin P. Bowen,
+    <b>"OpenMSI: A High-Performance Web-Based Platform for Mass Spectrometry Imaging"</b>
+       Analytical Chemistry 2013 85 (21), 10354-10361, DOI: 10.1021/ac402540a. [<a href="{{ STATIC_URL }}images/publications/openmsi_acs_2013.bib">BibTeX</a>][<a href=http://pubs.acs.org/doi/abs/10.1021/ac402540a target="_blank">Online at ACS</a>]
+</div>
+
+
+
+{% endblock %}

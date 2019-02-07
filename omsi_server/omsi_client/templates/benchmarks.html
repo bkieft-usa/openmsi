@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+<br>
+<table
+style="text-align: left; width: 800px; margin-left: auto; margin-right: auto;"
+border="0" cellpadding="2" cellspacing="0">
+<tbody>
+<tr>
+<td style="vertical-align: top;">
+<h3 style="text-align: center;">File Format Optimizations</h3>
+</td>
+</tr>
+</tbody>
+</table>
+<table
+style="text-align: left; width: 800px; background-color: rgb(109, 109, 109); margin-left: auto; margin-right: auto;"
+border="0" cellpadding="2">
+<tbody>
+<tr>
+<td style="vertical-align: top;">
+<div style="text-align: justify;"><span style="color: white;">Analysis
+and visualization of mass
+spectrometry imaging (MSI) data is
+often based on selected subsets of the data, e.g., single or multiple
+spectra or m/z data slices. It is, therefore, crucial that we are able
+to quickly access select subsets of the data. In the context of
+web-based applications —such as the OpenMSI Viewer— this is
+particularly crucial in order to enable interactive data analysis and
+to provide a satisfactory user experience. One focus in development of
+the OpenMSI file format has been to characterizing and optimize the
+performance of data access operations performed in serial and parallel
+on OMSI HDF5 files. All optimizations are implemented transparently in
+HDF5, i.e, the optimizations are defined via a single function call to
+set up the layout and dataset properties prior to writing the data
+while the actual read/write of the data do not change. </span><span
+style="color: white;">More details on the I/O performance of the
+OpenMSI
+data format are available as part of the</span> <a
+href="https://portal-auth.nersc.gov/openmsi/client/docs">OpenMSI
+Documentation</a> <span style="color: white;">(Section: HDF5 I/O
+Performance)</span><br>
+<br>
+</div>
+<table
+style="text-align: left; width: 100%; margin-left: 0px; margin-right: 0px;"
+border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td style="vertical-align: top;">
+<div style="text-align: justify;"><img
+style="width: 500px; height: 432px;" alt=""
+src="http://portal.nersc.gov/project/openmsi/omsi_static/HDF5_Performance_Chunking_Hopper_PerfScore_small.png"
+align="right"><span style="font-weight: bold; color: white;"><big>Chunking:</big>
+</span><span style="color: white;">Many
+application use
+traditional flat binary formats to store MSI data. In such formats, the
+MSI data data is typically stored one-spectrum-at-a-time in a contiguous
+block of data. Using this strategy does not allow for optimization of
+orthogonal data access. E.g, access to single spectra is very efficient
+while access to a single m/z data slice requires traversal of the full
+data volume.</span><br style="color: white;">
+<br style="color: white;">
+<span style="color: white;">In contrast to storing the data
+in a single block in the HDF5 file,
+using chunking the data is split into multiple chunks. Each chunk of a
+dataset is allocated separately and stored at independent locations
+throughout the HDF5 file. The chunks of a dataset can then be written
+and read independently enabling independent parallel I/O and
+potentially improving performance of partial I/O operations required
+when operating on subsets of the data.</span><br style="color: white;">
+<br style="color: white;">
+<span style="color: white;">To illustrate the overall
+performance of the different dataset layouts and to identify the “best”
+layouts, we defined a set of&nbsp; the of minimum performance criteria
+a data layout should fulfill. The results of the performance score are
+summarized in the figure above. A detailed discussion of the file
+format performance is available as part of the</span> <a
+href="https://portal-auth.nersc.gov/openmsi/client/docs">OpenMSI
+Documentation</a> <span style="color: white;">(Section: HDF5 I/O Performance)</span></div>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<table
+style="text-align: left; width: 100%; margin-left: 0px; margin-right: 0px;"
+border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td style="vertical-align: top;"><img
+src="http://portal.nersc.gov/project/openmsi/omsi_static/omsi_compression_small.png"
+alt="" style="width: 500px; height: 339px;" align="left"><span
+style="font-weight: bold; color: white;"></span>
+<div style="text-align: justify;"><big><span
+style="font-weight: bold; color: white;">Compression: </span></big><span
+style="color: white;">Use
+of chunking also enables the use of HDF5 I/O filters. We here
+investigated the use of compression filters. I/O filters are applied in
+HDF5 to each chunk individually, and entire chunks are compressed at
+once. The compression and decompression of the data is handled
+transparently by the HDF5 library, so that the user can use the data in
+the same way independent of whether chunking and compression are
+enabled or not. The figure shown on the lefts presents a summary of compression
+results for a diverse set of MSI datasets. A more detailed discussion of
+the use of compression is available as part of the </span> <a
+href="https://portal-auth.nersc.gov/openmsi/client/docs">OpenMSI
+Documentation</a> <span style="color: white;">(Section: HDF5 I/O
+Performance)</span></div>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<table
+style="text-align: left; width: 800px; margin-left: auto; margin-right: auto;"
+border="0" cellpadding="2" cellspacing="0">
+<tbody>
+<tr>
+<td style="vertical-align: top;">
+<h3 style="text-align: center;">Parallel Peak Finding using OpenCL</h3>
+</td>
+</tr>
+</tbody>
+</table>
+<table
+style="text-align: left; width: 800px; margin-left: auto; margin-right: auto;"
+border="0" cellpadding="2" cellspacing="0">
+<tbody>
+<tr>
+<td
+style="vertical-align: top; background-color: rgb(109, 109, 109);"><span
+style="color: white;">
+<div style="text-align: justify;">The goal of the local peak finding it to
+classify each spectrum (one per pixel) to find all main peaks in the
+spectrum. Classification of the spectra is important for further
+analyses of the spectra, e.g., data clustering. Traditionally peak
+finding is performed in serial, one spectrum at a time. During the peak
+finding, each spectrum is processed independently. s part of the
+OpenMSI effort we investigated the of GPU's to accelerate the peak
+finding process by processing multiple spectra in parallel.&nbsp; Even
+for small MSI datasets, processing all spectra often requires several
+hours (e.g., ~6h for a 227 x 108 x 63387 dataset) and may require
+several days for medium sized datasets. Using our GPU-based peak
+finding algorithm we are able to complete the analysis in just a few
+minutes. Processing of a dataset with a resolution of 227 x 108 x 63378
+(1.2GB) required only ~117 seconds and processing of a larger 160 x 250
+x 116152 (9.3GB) dataset required only ~697 seconds.<br>
+</div>
+</span></td>
+</tr>
+</tbody>
+</table>
+<div style="text-align: center;"><br>
+<br>
+</div>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}

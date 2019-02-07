@@ -1,0 +1,143 @@
+{% extends "omsi_client/templates/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+</style>
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+
+
+
+<div class="modal fade" id="flareLongTextModal" >
+    <!--;overflow-y:scroll;-->
+    <div class="modal-dialog modalFlare" style="width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h3>Description</h3>
+            </div>
+            <div class="modal-body" >
+                <p id="flareLongTextText" ></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<body>
+<div class="container-fluid">
+    <!-- <div class="row"> -->
+    <!-- <div id="activeTextText">
+            <p>Text to be replaced</p>
+                </div>
+            <button id="launchViewer" class="btn btn-small">Viewer</button>
+            <button id="downloadObject" class="btn btn-small">Download</button>
+            <button id="changePermissions" class="btn btn-small">Permissions</button>         -->
+    <div class="span5">
+        <!-- <div> -->
+         <!-- class="panel panel-default">    -->
+          <!-- <div class="panel-heading"> -->
+            <!-- <p>Click on a file to view, manage permissions, and download</p> -->
+        <!-- </div> -->
+            <table id="file_table">
+                <thead>
+                    <tr>
+                        <th>Filename</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr>
+                        <td>Row 1 Data 1</td>
+                        </tr> -->
+                        <!-- <tr>
+                        <td>Row 2 Data 1</td>
+                    </tr> -->
+                </tbody>
+            </table>
+        <!-- </div>  -->
+
+    </div> <!-- End Span4 -->
+        <div class = "span7"> <!-- style="margin-left:100px"> -->
+        <h3>Entries for this File</h3><p>Click on the grey bars to show/hide content</p>
+
+        <div id = "loading"><img style="display : block;margin : auto;" src="{{ STATIC_URL }}/images/ajax-loader.gif" />        </div>
+
+                <div id="svgDivFlare"></div>
+
+    </div>
+    <!-- <div> -->
+</div>
+<script src="{{ STATIC_URL }}makeFileFlare.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="{{ STATIC_URL }}jquery.dataTables.1.10.2.min.js"></script>
+
+
+<script>
+var api_root = '{{ api_root }}';
+
+$( document ).ready(function()
+{
+    var myURL = api_root + 'qmetadata/?mtype=filelistView';
+    $.getJSON((myURL),function(fileList){
+        var keys = Object.keys(fileList);
+        for (var i=0 ; i<keys.length; i++) {
+              var fileId = keys[i];
+              var filename = fileId.replace(/^.*[\\\/]/, '');
+            $('#file_table').find('tbody').append('<tr id = '+ encodeURIComponent(fileId) +'><td style="word-wrap: break-word">'+filename+'</td></tr>')
+        }
+        activateClickers();
+        $('#file_table').dataTable({
+            // pagelength: 20
+            // paging: false
+        });
+        // $('#file_table').dataTable();
+
+        getflare(keys[0]);
+        });
+});
+
+
+function activateClickers()
+{
+    $('#file_table tbody tr').click(function(e) {
+        console.log($(this).text())
+        $('#loading').show();
+        // $(this).addClass('highlight').siblings().removeClass('highlight');
+        // $('#file_table').find('tr.highlight').removeClass('highlight');
+        // $(this).addClass('active')
+        $("#svgDivFlare svg").fadeTo('slow',0);
+
+//        getflare($(this).text());
+        getflare($(this).attr('id'));
+    });
+};
+
+
+</script>
+</body>
+
+{% endblock %}

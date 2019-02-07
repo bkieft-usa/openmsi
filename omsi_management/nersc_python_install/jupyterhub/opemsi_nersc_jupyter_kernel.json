@@ -1,0 +1,14 @@
+{
+ "argv": [
+  "/global/project/projectdirs/openmsi/jupyterhub_libs/anaconda/bin/python",
+  "-m",
+  "IPython.kernel",
+  "-f",
+  "{connection_file}"
+ ],
+ "env": {
+    "PATH": "/global/project/projectdirs/openmsi/jupyterhub_libs/anaconda/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+ },
+ "display_name": "OpenMSI Python 2 Test",
+ "language": "python"
+}

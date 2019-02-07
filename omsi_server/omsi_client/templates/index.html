@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.span4 > div
+{
+   background-color:#EFF2FB;
+   border: 2px solid #888;
+   border-radius:3px;
+    height:700px;
+}
+
+
+
+</style>
+
+<script>
+function openWin(url)
+{
+	window.open(url);
+}
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-39099473-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<!--<div class="container-fluid" style="background-color:#F2F2F2; border: 0px solid #888; border-radius:3px;">-->
+    <!--<div class="container" >-->
+        <!--<div class = "row-fluid">-->
+        	<!--<div class = "span12" style="text-align:left;">-->
+                <!--<h3 style="color:black;">OpenMSI: Advanced visualization, analysis and management of mass spectrometry imaging data via the web.  <a href="/openmsi/resources/hierarchicalFilemanager.html">Click here</a> to see a available files.</h3>-->
+                <!--<hr style="border: 2px solid #888;">-->
+                <!--<h3 style="color:black;">Advanced visualization, analysis and management of mass spectrometry imaging data via the web.  <a href="/openmsi/resources/hierarchicalFilemanager.html">Click here</a> to see a available files.</h3>-->
+
+            <!--</div>-->
+        	<!--<div class = "span4" style="text-align:center;">-->
+    	    <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+<!--<br>-->
+
+<div class="container">
+
+<div class=row-fluid>
+                <div class="span12">
+                    <h3 style="color:black;">OpenMSI: Web-based visualization, analysis and management of mass spectrometry imaging data</h3>
+                    <!--<h1>Mission</h1>-->
+                    <!--<p><b>To make the most high-performance, advanced data management, model building, analysis and visualization resources for mass spectrometry imaging accessible to scientists via the web.</b></p>-->
+                    <br>
+                    <p>Mass spectrometry imaging (MSI) is widely applied to image complex samples for applications spanning health, microbial ecology, and high throughput screening of high-density arrays. MSI has emerged as a technique suited to resolving metabolism within complex cellular systems; where understanding the spatial variation of metabolism is vital for making a transformative impact on science.  Unfortunately, the scale of MSI data and complexity of analysis presents an insurmountable barrier to scientists where a single 2D-image may be many gigabytes and comparison of multiple images is beyond the capabilities available to most scientists.  The OpenMSI project will overcome these challenges, allowing broad use of MSI to researchers by providing a web-based gateway for management and storage of MSI data, the visualization of the hyper-dimensional contents of the data, and the statistical analysis.</p>
+                    <h4 style="text-align:right;">Select an image below or <a href="/openmsi/resources/hierarchicalFilemanager.html">click here</a> to view additional files</h4>
+                    <hr style="border: 2px solid #888;">
+
+                </div>
+            </div>
+
+
+
+<div class = "row-fluid">
+        <div class = "span4" style="text-align:center;">
+    	    <div>
+                <!--12 day flax.  made image. flaxPod.png. 392.98, 462.12, 483, [97, 101] [294, 202] 15Gb-->
+                <!--Cross section (15 um) of Flax (Linum usitatissimum) pod-->
+        	    <button class="btn btn-large  btn-primary" type="button" style="margin-top:10px;margin-left:10px;margin-right:10px;" onclick="location.href='/openmsi/client/viewer?cursorCol2=194&cursorCol1=97&rangeValue=0.0999988878038&cursorRow1=101&cursorRow2=202&image_name=Flax_Pod_12_day_old_CS.h5&channel3Value=639.9939&enableClientCache=true&channel2Value=459.9959&dataIndex=0&file=%2Fproject%2Fprojectdirs%2Fopenmsi%2Fomsi_data_private%2Fbpb%2FFlax_Pod_12_day_old_CS.h5&channel1Value=279.9979&expIndex=0'">Launch Flax Pod »</button>
+              	<a href = "/openmsi/client/viewer?cursorCol2=194&cursorCol1=97&rangeValue=0.0999988878038&cursorRow1=101&cursorRow2=202&image_name=Flax_Pod_12_day_old_CS.h5&channel3Value=639.9939&enableClientCache=true&channel2Value=459.9959&dataIndex=0&file=%2Fproject%2Fprojectdirs%2Fopenmsi%2Fomsi_data_private%2Fbpb%2FFlax_Pod_12_day_old_CS.h5&channel1Value=279.9979&expIndex=0"><img style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px;margin-bottom:10px;" alt="" src="{{ STATIC_URL }}/bootstrap/img/flaxPod.png" title="Click to Launch Viewer of Microbial Interactions"></a>
+                <div style="margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:30px;">
+                    <p style="text-align:left;"><b>Sample:</b> Flax (<i>Linum usitatissimum</i>) pod</p>
+                    <p style="text-align:left;"><b>Instrument:</b> Waters Synapt G2 HDMS</p>
+                    <p style="text-align:left;"><b>Desorption/Ionization Method:</b> MALDI DHB</p>
+                    <p style="text-align:left;"><b>Original File:</b> *.imzML and *.img</p>
+                    <p style="text-align:left;"><b>Original Filesize:</b> 15 GB</p>
+                    <p style="text-align:left;"><b>OpenMSI Filesize:</b> 2.7 GB</p>
+                    <p style="text-align:left;"><b>Image dimensions:</b> 303 x 291 pixels</p>
+                    <p style="text-align:left;"><b>Pixel size:</b> 20 microns</p>
+                    <p style="text-align:left;"><b>#m/z bins:</b> 90,000</p>
+                    <!--<p style="text-align:left;"><b>Computed data:</b> peak-finding, NMF</p>-->
+                    <p style="text-align:left;"><b>Contributors:</b> Doralyn S. Dalisay, Hong Yang, Laurence B. Davin and Norman G. Lewis</p>
+                </div>
+            </div>
+        </div>
+
+
+		<div class = "span4" style="text-align:center;">
+		    <div>
+                <!--Potato eye. made image. potatoEye.png. 868.55 (Solanine); 164.15; 850.55 [193, 37] [276, 31] -->
+                <!--/openmsi/client/viewer?cursorCol2=308&cursorCol1=154&rangeValue=0.158085305442&cursorRow1=41&cursorRow2=82&image_name=20110125_Potato_Eye.h5&channel3Value=1812.2857&enableClientCache=true&channel2Value=1214.8497&dataIndex=0&file=%2Fproject%2Fprojectdirs%2Fopenmsi%2Fomsi_data_private%2Fbpb%2F20110125_Potato_Eye.h5&channel1Value=617.4138&expIndex=0-->
+                <button class="btn btn-large  btn-primary" type="button" style="margin-top:10px;margin-left:10px;margin-right:10px;" onclick = "location.href='/openmsi/client/viewer?cursorCol2=308&cursorCol1=154&rangeValue=0.158085305442&cursorRow1=41&cursorRow2=82&image_name=20110125_Potato_Eye.h5&channel3Value=1812.2857&enableClientCache=true&channel2Value=1214.8497&dataIndex=0&file=%2Fproject%2Fprojectdirs%2Fopenmsi%2Fomsi_data_private%2Fbpb%2F20110125_Potato_Eye.h5&channel1Value=617.4138&expIndex=0'">Launch Potato Eye »</button>
+                <a href="/openmsi/client/viewer?cursorCol2=308&cursorCol1=154&rangeValue=0.158085305442&cursorRow1=41&cursorRow2=82&image_name=20110125_Potato_Eye.h5&channel3Value=1812.2857&enableClientCache=true&channel2Value=1214.8497&dataIndex=0&file=%2Fproject%2Fprojectdirs%2Fopenmsi%2Fomsi_data_private%2Fbpb%2F20110125_Potato_Eye.h5&channel1Value=617.4138&expIndex=0"><img style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px;margin-bottom:10px;" alt="" src="{{ STATIC_URL }}/bootstrap/img/potatoEye.png" title="Click to Launch Viewer of NIMS Brain Image"></a>
+                <div style="margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:30px;">
+                    <p style="text-align:left;"><b>Sample:</b> Potato eye stamped on NIMS chip</p>
+                    <p style="text-align:left;"><b>Instrument:</b> AbSciex 5800</p>
+                    <p style="text-align:left;"><b>Desorption/Ionization Method:</b> NIMS</p>
+                    <p style="text-align:left;"><b>Original File:</b> *.img</p>
+                    <p style="text-align:left;"><b>Original Filesize:</b> 21 GB</p>
+                    <p style="text-align:left;"><b>OpenMSI Filesize:</b> 8.5 GB</p>
+                    <p style="text-align:left;"><b>Image dimensions:</b> 123 x 463 pixels</p>
+                    <p style="text-align:left;"><b>Pixel size:</b> 100 microns</p>
+                    <p style="text-align:left;"><b>#m/z bins:</b> 188,960</p>
+                    <p style="text-align:left;"><b>Computed data:</b> peak-finding, NMF</p>
+                    <p style="text-align:left;"><b>Contributors:</b> Katherine Louie and Trent Northen</p>
+                </div>
+            </div>
+        </div>
+
+		<div class = "span4" style="text-align:center;">
+		    <div>
+                <!--Poplar leaf. made image. Leaf.png. 629.4; 455.1; 403.1; [119,150]; [51,73]; 4.2G-->
+                <button class="btn btn-large  btn-primary" type="button" style="margin-top:10px;margin-left:10px;margin-right:10px;" onclick="location.href='/openmsi/client/viewer?cursorCol2=115&cursorCol1=57&rangeValue=0.0999983317057&cursorRow1=71&cursorRow2=142&image_name=Transgenic_Hybrid_Poplar_Leaf.h5&channel3Value=459.9939&enableClientCache=true&channel2Value=339.9959&dataIndex=0&file=/project/projectdirs/openmsi/omsi_data_private/bpb/Transgenic_Hybrid_Poplar_Leaf.h5&channel1Value=219.9979&expIndex=0'">Launch Poplar Leaf »</button>
+                <a href="/openmsi/client/viewer?cursorCol2=115&cursorCol1=57&rangeValue=0.0999983317057&cursorRow1=71&cursorRow2=142&image_name=Transgenic_Hybrid_Poplar_Leaf.h5&channel3Value=459.9939&enableClientCache=true&channel2Value=339.9959&dataIndex=0&file=%2Fproject%2Fprojectdirs%2Fopenmsi%2Fomsi_data_private%2Fbpb%2FTransgenic_Hybrid_Poplar_Leaf.h5&channel1Value=219.9979&expIndex=0"><img style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px;margin-bottom:10px;" alt="" src="{{ STATIC_URL }}/bootstrap/img/Leaf.png" title="Click to Launch Viewer of High Res. Tissue Image"></a>
+                <div style="margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:30px;">
+                    <p style="text-align:left;"><b>Sample:</b> Leaf of transgenic hybird Poplar (<i>Populus tremula × Populus alba</i>)</p>
+                    <p style="text-align:left;"><b>Instrument:</b> Waters Synapt G2 HDMS</p>
+                    <p style="text-align:left;"><b>Desorption/Ionization Method:</b> MALDI DHB</p>
+                    <p style="text-align:left;"><b>Original File:</b> *.img and *.imzML</p>
+                    <p style="text-align:left;"><b>Original Filesize:</b> 4.2 GB</p>
+                    <p style="text-align:left;"><b>OpenMSI Filesize:</b> 543 MB</p>
+                    <p style="text-align:left;"><b>Image dimensions:</b> 213 x 173 pixels</p>
+                    <p style="text-align:left;"><b>Pixel size:</b> 50 microns</p>
+                    <p style="text-align:left;"><b>#m/z bins:</b> 60,000</p>
+                    <p style="text-align:left;"><b>Contributors:</b> Costa, M.A., Marques, J.V., Dalisay, D.S., Herman, B., Bedgar, D.L., Davin, L.B. and Lewis N.G. Transgenic hybrid poplar for sustainable and scalable production of the commodity/specialty chemical, 2-phenylethanol. PLoS One, 2013 Dec 26;8(12):e83169</p>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Row -->
+<br>
+    <div class = "row-fluid">
+
+        <div class = "span4" style="text-align:center;">
+    	    <div>
+        	    <button class="btn btn-large  btn-primary" type="button" style="margin-top:10px;margin-left:10px;margin-right:10px;" onclick="location.href='/openmsi/client/viewer/?file=2012_0403_KBL_platename.h5&amp;image_name=Two%20Microbes%20on%20Rich%20LB-agar&amp;expIndex=0&amp;dataIndex=0&amp;channel1Value=746.22&amp;channel2Value=621.98&amp;channel3Value=523.36&amp;rangeValue=0.4&amp;cursorCol1=139&amp;cursorRow1=138&amp;cursorCol2=129&amp;cursorRow2=57'">Launch Microbial Interactions »</button>
+              	<a href = "/openmsi/client/viewer/?file=2012_0403_KBL_platename.h5&amp;image_name=Two%20Microbes%20on%20Rich%20LB-agar&amp;expIndex=0&amp;dataIndex=0&amp;channel1Value=746.22&amp;channel2Value=621.98&amp;channel3Value=523.36&amp;rangeValue=0.4&amp;cursorCol1=139&amp;cursorRow1=138&amp;cursorCol2=129&amp;cursorRow2=57"><img style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px;margin-bottom:10px;" alt="" src="{{ STATIC_URL }}/bootstrap/img/DoubleV.png" title="Click to Launch Viewer of Microbial Interactions"></a>
+                <div style="margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:30px;">
+                    <p style="text-align:left;"><b>Sample:</b> two microbes plated on rich LB-agar</p>
+                    <p style="text-align:left;"><b>Instrument:</b> AbSciex 5800</p>
+                    <p style="text-align:left;"><b>Desorption/Ionization Method:</b> NIMS</p>
+                    <p style="text-align:left;"><b>Original File:</b> *.img</p>
+                    <p style="text-align:left;"><b>Original Filesize:</b> 8.8 GB</p>
+                    <p style="text-align:left;"><b>OpenMSI Filesize:</b> 1.2 GB</p>
+                    <p style="text-align:left;"><b>Image dimensions:</b> 250 x 160 pixels</p>
+                    <p style="text-align:left;"><b>Pixel size:</b> 100 microns</p>
+                    <p style="text-align:left;"><b>#m/z bins:</b> 116,152</p>
+                    <p style="text-align:left;"><b>Contributors:</b> Louie, K. B.; Bowen, B. P.; Cheng, X.; Berleman, J. E.; Chakraborty, R.; Deutschbauer, A.; Arkin, A.; Northen, T. R. “Replica-extraction-transfer” nanostructure-initiator mass spectrometry imaging of acoustically printed bacteria. Anal. Chem. 2013, 85, 10856–10862.</p>
+                </div>
+            </div>
+        </div>
+
+
+		<div class = "span4" style="text-align:center;">
+		    <div>
+                <button class="btn btn-large  btn-primary" type="button" style="margin-top:10px;margin-left:10px;margin-right:10px;" onclick = "location.href='/openmsi/client/viewer/?file=%2Fdata%2Fopenmsi%2Fomsi_data%2F20120711_Brain.h5&amp;image_name=Mouse%20Brain:%20Left%20Coronal%20Hemisphere&amp;expIndex=0&amp;dataIndex=0&amp;channel1Value=868.6&amp;channel2Value=840.6&amp;channel3Value=824.6&amp;rangeValue=0.2&amp;cursorCol1=40&amp;cursorRow1=40&amp;cursorCol2=80&amp;cursorRow2=80'">Launch NIMS Brain »</button>
+                <a href="/openmsi/client/viewer/?file=%2Fdata%2Fopenmsi%2Fomsi_data%2F20120711_Brain.h5&amp;image_name=Mouse%20Brain:%20Left%20Coronal%20Hemisphere&amp;expIndex=0&amp;dataIndex=0&amp;channel1Value=868.6&amp;channel2Value=840.6&amp;channel3Value=824.6&amp;rangeValue=0.2&amp;cursorCol1=40&amp;cursorRow1=40&amp;cursorCol2=80&amp;cursorRow2=80"><img style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px;margin-bottom:10px;" alt="" src="{{ STATIC_URL }}/bootstrap/img/Brain.png" title="Click to Launch Viewer of NIMS Brain Image"></a>
+                <div style="margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:30px;">
+                    <p style="text-align:left;"><b>Sample:</b> a mouse brain: left coronal hemisphere</p>
+                    <p style="text-align:left;"><b>Instrument:</b> AbSciex 5800</p>
+                    <p style="text-align:left;"><b>Desorption/Ionization Method:</b> NIMS</p>
+                    <p style="text-align:left;"><b>Original File:</b> *.img</p>
+                    <p style="text-align:left;"><b>Original Filesize:</b> 2.2 GB</p>
+                    <p style="text-align:left;"><b>OpenMSI Filesize:</b> 0.3 GB</p>
+                    <p style="text-align:left;"><b>Image dimensions:</b> 122 x 120 pixels</p>
+                    <p style="text-align:left;"><b>Pixel size:</b> 80 microns</p>
+                    <p style="text-align:left;"><b>#m/z bins:</b> 80,339</p>
+                    <p style="text-align:left;"><b>Computed data:</b> peak-finding, NMF</p>
+                    <p style="text-align:left;"><b>Contributors:</b> Katherine Louie, Michael Balamotis, Ben Bowen, and Trent Northen</p>
+                </div>
+            </div>
+        </div>
+
+		<div class = "span4" style="text-align:center;">
+		    <div>
+                <button class="btn btn-large  btn-primary" type="button" style="margin-top:10px;margin-left:10px;margin-right:10px;" onclick="location.href='/openmsi/client/viewer/?file=lung_orbitrap.h5&amp;image_name=Mouse%20 Lung&amp;expIndex=0&amp;dataIndex=0&amp;channel1Value=723.495&amp;channel2Value=725.56&amp;channel3Value=734.572&amp;rangeValue=0.01&amp;cursorCol1=40&amp;cursorRow1=40&amp;cursorCol2=80&amp;cursorRow2=80'">Launch Orbitrap Lung »</button>
+                <a href="/openmsi/client/viewer/?file=lung_orbitrap.h5&amp;image_name=Mouse%20 Lung&amp;expIndex=0&amp;dataIndex=0&amp;channel1Value=723.495&amp;channel2Value=725.56&amp;channel3Value=734.572&amp;rangeValue=0.01&amp;cursorCol1=40&amp;cursorRow1=40&amp;cursorCol2=80&amp;cursorRow2=80"><img style="height: 200px;margin-top:10px;margin-left:10px;margin-right:10px;margin-bottom:10px;" alt="" src="{{ STATIC_URL }}/bootstrap/img/Lung.png" title="Click to Launch Viewer of High Res. Tissue Image"></a>
+                <div style="margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:30px;">
+                    <p style="text-align:left;"><b>Sample:</b> a rat lung</p>
+                    <p style="text-align:left;"><b>Instrument:</b> Thermo LTQ-Orbitrap</p>
+                    <p style="text-align:left;"><b>Desorption/Ionization Method:</b> MALDI</p>
+                    <p style="text-align:left;"><b>Original File:</b> *.RAW</p>
+                    <p style="text-align:left;"><b>Original Filesize:</b> 1 GB</p>
+                    <p style="text-align:left;"><b>OpenMSI Filesize:</b> 660 MB</p>
+                    <p style="text-align:left;"><b>Image dimensions:</b> 132 x 149 pixels</p>
+                    <p style="text-align:left;"><b>Pixel size:</b> 50 microns</p>
+                    <p style="text-align:left;"><b>#m/z bins:</b> 500,000</p>
+                    <p style="text-align:left;"><b>Contributors:</b> Fehniger, T. E.; Végvári, Á.; Rezeli, M.; Prikk, K.; Ross, P.; Dahlbäck, M.; Edula, G.; Sepper, R.; Marko-Varga, G. Direct Demonstration of Tissue Uptake of an Inhaled Drug: Proof-of-Principle Study Using Matrix-Assisted Laser Desorption Ionization Mass Spectrometry Imaging. Anal. Chem. 2011, 83, 8329–8336.</p>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Row -->
+</div>
+
+
+<br>
+
+    <div class="container-fluid" style="background-color:#ffffff; border: 0px solid #888; border-radius:3px;">
+        <div class="container" >
+            <!--<div class=row-fluid>-->
+                <!--<div class="span12">-->
+                    <!--<h3 style="color:black;">OpenMSI: Advanced visualization, analysis and management of mass spectrometry imaging data via the web.  <a href="/openmsi/resources/hierarchicalFilemanager.html">Click here</a> to see a available files.</h3>-->
+                    <!--<h1>Mission</h1>-->
+                    <!--<p><b>To make the most high-performance, advanced data management, model building, analysis and visualization resources for mass spectrometry imaging accessible to scientists via the web.</b></p>-->
+                    <!--<br>-->
+                    <!--<p>Mass spectrometry imaging (MSI) is widely applied to image complex samples for applications spanning health, microbial ecology, and high throughput screening of high-density arrays. MSI has emerged as a technique suited to resolving metabolism within complex cellular systems; where understanding the spatial variation of metabolism is vital for making a transformative impact on science.  Unfortunately, the scale of MSI data and complexity of analysis presents an insurmountable barrier to scientists where a single 2D-image may be many gigabytes and comparison of multiple images is beyond the capabilities available to most scientists.  The OpenMSI project will overcome these challenges, allowing broad use of MSI to researchers by providing a web-based gateway for management and storage of MSI data, the visualization of the hyper-dimensional contents of the data, and the statistical analysis of the data.</p>-->
+                    <!--<hr style="border: 2px solid #888;">-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="row-fluid">
+                <div class="span12">
+                	<!--<h2>Getting Started</h2>-->
+                	<!---->
+                    <!---->
+                	<!--<ul >-->
+                        <!--<li style="line-height:150%;"><b>Click on one of the demo images above</b></li>-->
+                        <!--<li style="line-height:150%;"><b>Type in ions of interest (m/z and range)</b></li>-->
+                        <!--<li style="line-height:150%;"><b>Move the cursors around the image to select spectra</b></li>-->
+                        <!--<li style="line-height:150%;"><b>Select from raw data or processed results</b></li>-->
+                    <!--</ul>-->
+                    <hr style="border: 2px solid #888;">
+
+                    <h2>Citing OpenMSI</h2>
+                    <p>Oliver Rübel, Annette Greiner, Shreyas Cholia, Katherine Louie, E. Wes Bethel, Trent R. Northen, and Benjamin P. Bowen,
+                       <b>"OpenMSI: A High-Performance Web-Based Platform for Mass Spectrometry Imaging"</b>
+                       Analytical Chemistry 2013 85 (21), 10354-10361, DOI: 10.1021/ac402540a. [<a href="{{ STATIC_URL }}images/publications/openmsi_acs_2013.bib">BibTeX</a>][<a href=http://pubs.acs.org/doi/abs/10.1021/ac402540a target="_blank">Online at ACS</a>]
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

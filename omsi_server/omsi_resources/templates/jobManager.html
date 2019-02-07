@@ -1,0 +1,493 @@
+{% extends "omsi_client/templates/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.2/css/jquery.dataTables.css">
+<style>
+
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+    td.details-control {
+        color: green;
+        cursor: pointer;
+    }
+
+    tr.shown td.details-control {
+       color: red;
+    }
+
+
+</style>
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+<script type="text/javascript" language="javascript" src="{{ STATIC_URL }}jquery.dataTables.1.10.2.min.js"></script>
+<!-- <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> -->
+
+<body>
+<div class="container" id="titleHeader">
+    <h2 style="text-align:center;">Manage Jobs</h2>
+    <hr>
+</div>
+
+<div class="container">
+  <table id="jobTable" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th></th>
+                <th valign="bottom">Job Id</th>
+                <th valign="bottom">Number of tries</th>
+                <th valign="bottom">Status</th>
+                <th valign="bottom">Task Type</th>
+                <th valign="bottom">Task User</th>
+                <th valign="bottom">Wall Time</th>
+                <th valign="bottom">Start Time</th>
+                <th valign="bottom">Task Description</th>
+                <th valign="bottom">Execution Settings</th>
+                <th valign="bottom">OMSI Files Created</th>
+                <th valign="bottom">OMSI Files Updated</th>
+                <th valign="bottom">OMSI Files Read</th>
+                <th valign="bottom">Raw Files Read</th>
+                <th valign="bottom">Raw Files Updated</th>
+                <th valign="bottom">Time Created</th>
+                <th valign="bottom">Last Update</th>
+                <th valign="bottom">Data Index</th>
+            </tr>
+        </thead>
+  </table>
+</div>
+<br>
+<br>
+<br>
+<!-- <div> -->
+
+
+
+<script>
+    var api_root = '{{ api_root }}';
+    var username = '{{ username }}';
+    var is_superuser = '{{ is_superuser}}'
+    var data = ''
+    var all_data = ''
+    var table = ''
+
+
+
+    // Initialize the document and populate the data table
+    $(document).ready(function() {
+        $('[rel="tooltip"]').tooltip({
+            placement : 'top',
+            container: 'body',
+            delay: { show: 750, hide: 100 }
+        });
+
+        // Setup - Add a checkbox for superusermode if needed
+        if (is_superuser){
+            $("#titleHeader").append('<div align="right" rel="tooltip" title="Check to display jobs of all users.">'+
+                                         '</lable>'+
+                                            '<input type="checkbox" id="superuserControl" onchange="updateTable()" unchecked>'+
+                                            '<b>Superuser Mode</b>'+
+                                        '</label>'+
+                                     '</div>')
+        }
+
+        // Setup - add a text input to each header cell to allow column-based search
+        $('#jobTable').find('thead th').each( function () {
+            var title = $('#jobTable thead th').eq( $(this).index() ).text();
+            if (title.length>0){
+                $(this).html( title + '<br> <input type="text" size="5" placeholder="Search" />' ); // '+title+'" />' );
+            }
+        });
+
+        // Request the data for the table
+        var myURL = get_jobinfo_url()
+        $.getJSON((myURL),function(job_data){
+            all_data = job_data
+            var data_index = 0
+            data  = Object.keys(job_data).map(function(key){
+                        var temp = job_data[key];
+                        temp['data_index'] = data_index
+                        data_index = data_index + 1
+                        return temp
+                });
+            // console.log(data)
+            table = $('#jobTable').DataTable({"data": data,
+                                      "columns": [{ className:        'details-control',
+                                                  "searchable":     false,
+                                                  "orderable":      false,
+                                                  "data":           null,
+                                                  "defaultContent": '<i class="glyphicon glyphicon-wrench"></i>'
+                                                },
+                                                { data: 'job_id' },
+                                                { data: 'number_of_tries' },
+                                                { data: 'status' },
+                                                { data: 'task_type' , visible: false},
+                                                { data: 'task_user', visible: false},
+                                                { data: 'wall_time_used'},
+                                                { data: 'start_time'},
+                                                { data: 'task_description', visible: false},
+                                                { data: 'execution_settings', visible: false},
+                                                { data: 'omsi_file_create', visible: false},
+                                                { data: 'omsi_file_update', visible: false},
+                                                { data: 'omsi_file_read', visible: false},
+                                                { data: 'rawfile_update', visible: false},
+                                                { data: 'rawfile_read', visible: false},
+                                                { data: 'created_time', visible: false},
+                                                { data: 'last_update', visible: false},
+                                                { data: 'data_index', visible: false}
+                                                ],
+                                      "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ]
+            });
+
+            // Apply the search
+            table.columns().eq( 0 ).each( function ( colIdx ) {
+                $( 'input', table.column( colIdx ).header() ).on( 'keyup change', function () {
+                    table.column( colIdx )
+                         .search( this.value )
+                         .draw();
+                });
+            });
+
+            // Add event listener for opening and closing details
+            $('#jobTable tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row( tr );
+
+                if ( row.child.isShown() ) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else {
+                    // Open this row
+                    // TODO change content of cell from + to - icon and vice versa
+                    // table.cell(0,0).data('<i class="glyphicon glyphicon-minus"></i>').draw()
+                    row.child( format(row.data(), row.index()) ).show();
+                    //table.cell(row.index(), 0)).node('<i class="glyphicon glyphicon-minus"></i>')
+                    tr.addClass('shown');
+                }
+            } );
+
+        }).error( function() {
+            // We have a redirect. Simply reload the page so that the user gets pointed to the login page
+            window.location = location
+        });
+    });
+
+    /* Formatting function for editing and display of job details. Called when row-childs are added to the display */
+    function format ( rowdata, rowindex ) {
+        // `d` is the original data object for the row
+        var childForm = '<div class="container-fluid"><h3>Job Details: ' + rowdata.job_id + '</h3>'
+
+        // Add buttons to the menu of the child-row depending on the status of the job
+        var buttonAdded = false
+        if (rowdata.status == 'c' || rowdata.status == 'e'){
+            childForm = childForm + '<button id="statusMessageButton' + rowdata.data_index + '"class="btn btn-default" onClick="getStatusMessage(\'' + rowdata.data_index + '\', \'' +rowindex + '\')">Status Message</button> '
+            buttonAdded = true
+        }
+        if (rowdata.status == 'q' || rowdata.status == 'g' || rowdata.status == 'w' || rowdata.status == 'r'){ //If the job is queued, ready to go, or waiting
+            childForm = childForm + '<button id="statusButton' + rowdata.data_index + '" class="btn btn-default" onClick="checkJobStatus(\'' + rowdata.data_index + '\', \'' +rowindex + '\')">Update Status</button> '
+            buttonAdded = true
+        }
+        if (rowdata.status == 'q'){
+            childForm = childForm + '<button id="estimateJobStartButton' + rowdata.data_index + '"class="btn btn-default" onClick="estimateJobStart(\'' + rowdata.data_index + '\', \'' +rowindex + '\')">Estimate Start Time</button> '
+            buttonAdded = true
+        }
+        if (rowdata.status == 'e' || rowdata.status == 'g' || rowdata.status == 'w'){
+            childForm = childForm + '<button id="submitButton' + rowdata.data_index + '"class="btn btn-default" onClick="submitJob(\'' + rowdata.data_index + '\', \'' +rowindex + '\')">Submit</button> '
+            buttonAdded = true
+        }
+        if (rowdata.status == 'q' || rowdata.status == 'g' || rowdata.status == 'w'){
+            childForm = childForm + '<button id="deleteButton' + rowdata.data_index + '"class="btn btn-default" onClick="deleteJob(\'' + rowdata.data_index + '\', \'' +rowindex + '\')">Delete</button> '
+            buttonAdded = true
+        }
+        // TODO Add cancel button to only remove the job from the queue but to not delete it from the database
+        if(buttonAdded){
+            childForm = childForm + '<div id="jobStatusField' + rowdata.data_index +'"></div><br>'
+        }
+        childForm = childForm + '</div>'+
+        '<table cellpadding="5" cellspacing="0" border="0">'+
+        '<tr>'+
+            '<td>Number of Tries:</td>'+
+            '<td>'+rowdata.number_of_tries+'</td>'+
+        '<tr>'+
+            '<td>Status:</td>'+
+            '<td>'+rowdata.status+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Task Type:</td>'+
+            '<td>'+rowdata.task_type+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>User:</td>'+
+            '<td>'+rowdata.task_user+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Wall:</td>'+
+            '<td>' + rowdata.wall_time_used + ' s </td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Start Time:</td>'+
+            '<td>'+rowdata.start_time+'</td>'+
+        '</tr>'+
+        //'<tr>'+
+        //    '<td>Memory / (Virtual Memory) Used:</td>'+
+        //    '<td>'+rowdata.mem_used + ' / ('+ rowdata.vmem_used +') kb </td>'+
+        //'</tr>'+
+        '<tr>'+
+            '<td>Description:</td>'+
+            '<td>'+JSON.stringify(rowdata.task_description)+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Execution Settings:</td>'+
+            '<td>'
+
+        var exec_obj = rowdata.execution_settings
+        for(var key in exec_obj){
+            if (exec_obj.hasOwnProperty(key)){
+                childForm = childForm +key+' = '+ JSON.stringify(exec_obj[key])+'<br>'
+            }
+        }
+        childForm = childForm + '</td></tr>'
+
+        childForm = childForm +
+            //'<tr>'+
+            //    '<td>Status Message:</td>'+
+            //    '<td>'+ JSON.stringify(rowdata.status_message)+'</td>'+
+            //'</tr>'+
+            '<tr>'+
+                '<td>Time Created</td>'+
+                '<td>'+rowdata.created_time+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>OMSI Files Created</td>'+
+                '<td>'+rowdata.omsi_file_create+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>OMSI Files Updated</td>'+
+                '<td>'+rowdata.omsi_file_update+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>OMSI Files Read</td>'+
+                '<td>'+rowdata.omsi_file_read+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>Raw Files Read</td>'+
+                '<td>'+rowdata.rawfile_read+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>Raw Files Updated</td>'+
+                '<td>'+rowdata.rawfile_update+'</td>'+
+            '</tr>'+
+        '</table>';
+
+        return childForm
+    }
+
+    // Create URL for requesting the data for the table
+    function get_jobinfo_url(jobid){
+        var myURL = [api_root + 'processing/jobs']
+        if (is_superuser){
+            console.log(document.getElementById("superuserControl").checked)
+            var hasQueryString = false
+            if(!document.getElementById("superuserControl").checked){
+                myURL = myURL + '?username=' + username
+                hasQueryString = true
+            }
+            if (typeof jobid !== 'undefined'){
+                if (!hasQueryString){
+                    myURL = myURL + "?"
+                }else{
+                    myURL = myURL + "&"
+                }
+                myURL = myURL + "jobid=" + jobid
+            }
+        }
+        return myURL
+    }
+
+    // Update the complete data table
+    function updateTable(){
+        // Get the new data
+        var myURL = get_jobinfo_url()
+        $.getJSON((myURL),function(job_data){
+            // Create the data array
+            all_data = job_data
+            var data_index = 0
+            data  = Object.keys(job_data).map(function(key){
+                        var temp = job_data[key];
+                        temp['data_index'] = data_index
+                        data_index = data_index + 1
+                        return temp
+                });
+            // Clear the table, set the new data, and redraw the table
+            table.clear()
+            table.rows.add(data)
+            table.draw()
+        });
+    }
+
+    // Request new data for the given row and update the row data as well as the child-row if it is shown
+    function updateRow(dataindex, rowindex, statusMessage){
+        var current_jobid = data[dataindex]['job_id']
+        var jobURL = get_jobinfo_url(current_jobid)
+            $.getJSON((jobURL), function(job_status){
+                var new_data = job_status[current_jobid]
+                new_data['data_index'] = dataindex
+                var current_row = table.row(rowindex)
+                current_row.data(new_data)
+                if (current_row.child.isShown()){
+                    current_row.child.remove()
+                    current_row.child( format(current_row.data(), rowindex) ).show();
+                }
+                if(typeof statusMessage !== 'undefined'){
+                    var jobStatusFieldName = "jobStatusField" + dataindex
+                    if (typeof document.getElementById(jobStatusFieldName)  !== 'undefined'){
+                        document.getElementById(jobStatusFieldName).innerHTML = statusMessage
+                    }
+                }
+                table.draw()
+            }).error( function() {
+                // We have a redirect. Simply reload the page so that the user gets pointed to the login page
+                window.location = location
+            });
+    }
+
+     // Function called to updated the job status when the update job status button has been clicked
+    function checkJobStatus(dataindex, rowindex){
+        //Update the status button to add a spinner and to disable it while we update the status
+        var buttonId = "statusButton"+dataindex
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Updating Status...</bf>";
+        document.getElementById(buttonId).disabled = true
+
+        // Get the estimated job status
+        var current_jobid = data[dataindex]['job_id']
+        // Force update of the job status on the server side by calling the processing/update REST function
+        var myURL = [api_root + 'processing/update/?jobid=' + encodeURIComponent(current_jobid) + '&showstart=false']
+        $.getJSON((myURL),function(new_status){
+            updateRow(dataindex, rowindex)  // This call gets the new information from the processing/jobs call
+            document.getElementById(buttonId).innerHTML = "Update Job Status";
+            document.getElementById(buttonId).disabled=false;
+        });
+    }
+
+    // Function called when we are asked to estimate the start time
+    function estimateJobStart(dataindex, rowindex){
+        //Update the status button to add a spinner and to disable it while we update the status
+        var buttonId = "estimateJobStartButton"+dataindex
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Updating Status...</bf>";
+        document.getElementById(buttonId).disabled = true
+
+        // Update the job status and estimate the start time
+        var current_jobid = data[dataindex]['job_id']
+        var myURL = [api_root + 'processing/update/?jobid=' + encodeURIComponent(current_jobid) + '&showstart=true']
+        $.getJSON((myURL),function(new_status){
+            // Define the status message to be shown
+            var statusMessage = ''
+            if (new_status['message']['status']!="ERROR"){
+                statusMessage = statusMessage.concat('<p><b>Estimated Start Time:</b></p>')
+                var estimate = new_status['message']['showstart'].split("Estimated")
+                statusMessage = statusMessage.concat('<ul>')
+                for (var i = 0; i < estimate.length; i++) {
+                    statusMessage = statusMessage.concat('<li>' + estimate[i]  + '</li>');
+                }
+                statusMessage = statusMessage.concat('</ul>')
+            }else{
+                statusMessage = '<b>' + new_status['message']['error'] + '</b>'
+            }
+            // Call processing/jobs to retrieve the current job information and update the row and child
+            updateRow(dataindex, rowindex, statusMessage)
+
+            // Reset the estimate start time button to be enabled and without the spinner
+            document.getElementById(buttonId).innerHTML = "Estimate Start Time";
+            document.getElementById(buttonId).disabled=false;
+        });
+    }
+
+    //Get the status message for a job
+    function getStatusMessage(dataindex, rowindex){
+        //Update the status button to add a spinner and to disable it while we update the status
+        var buttonId = "statusMessageButton"+dataindex
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Checking Status...</bf>";
+        document.getElementById(buttonId).disabled = true
+
+        // Update the job status and estimate the start time
+        var current_jobid = data[dataindex]['job_id']
+        var myURL = [api_root + 'processing/jobs/?jobid=' + encodeURIComponent(current_jobid) + '&showstart=false&status_message=true']
+        $.getJSON((myURL),function(new_status){
+            // Define the status message to be shown
+            var statusMessage = new_status[current_jobid]['status_message']
+            if (statusMessage == ""){
+                statusMessage = "No status message found."
+            }
+             // Call processing/jobs to retrieve the current job information and update the row and child
+            updateRow(dataindex, rowindex, statusMessage)
+
+            // Reset the estimate start time button to be enabled and without the spinner
+            document.getElementById(buttonId).innerHTML = "Status Message";
+            document.getElementById(buttonId).disabled=false;
+        });
+    }
+
+    // Function called when the resubmit job button is clicked
+    function submitJob(dataindex, rowindex){
+        //Update the submit button to add a spinner and to disable it while we update the status
+        var buttonId = "submitButton"+dataindex
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Updating Status...</bf>";
+        document.getElementById(buttonId).disabled = true
+
+        // Submit the job if possible and update the data table
+        var current_jobid = data[dataindex]['job_id']
+        var myURL = [api_root + 'processing/update/?jobid=' + encodeURIComponent(current_jobid) + '&showstart=false&submit=true']
+
+        $.getJSON((myURL),function(new_status){
+            updateRow(dataindex, rowindex)
+            document.getElementById(buttonId).innerHTML = "Update Job Status";
+            document.getElementById(buttonId).disabled=false;
+        });
+    }
+
+    // Function called to delete a job when the delete job button is clicked
+    function deleteJob(dataindex, rowindex){
+         //Update the submit button to add a spinner and to disable it while we update the status
+        var buttonId = "deleteButton"+dataindex
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Deleting Job...</bf>";
+        document.getElementById(buttonId).disabled = true
+
+        // Submit the job if possible and update the data table
+        var current_jobid = data[dataindex]['job_id']
+        var myURL = [api_root + 'processing/update/?jobid=' + encodeURIComponent(current_jobid) + '&delete=true']
+
+        $.getJSON((myURL),function(response){
+            if (response['status'] == 'OK'){
+                // Recreate the data table
+                updateTable()
+            }else{
+                updateRow(dataindex, rowindex)
+                document.getElementById(buttonId).innerHTML = "Delete Job";
+                document.getElementById(buttonId).disabled=false;
+            }
+        });
+    }
+
+    // TODO Add D3 plots add the bottom of the page with statistics for the tasks currently shown in the table: e.g, number of jobs, histogram of wait times and memory usage and averages etc. In superuser mode also include stats separated per user.
+
+</script>
+</body>
+
+{% endblock %}

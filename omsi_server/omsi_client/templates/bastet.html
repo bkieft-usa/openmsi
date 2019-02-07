@@ -1,0 +1,156 @@
+{% extends "omsi_client/templates/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+    .glyphicon {
+        font-size: 65px;
+    }
+
+</style>
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+
+<body>
+<div class="container">
+
+
+
+<h1>BASTet: Berkeley Analysis and Storage Toolkit</h1>
+<img src="{{ STATIC_URL }}images/bastet/bastet_overview.png" class="img-responsive center-block" width="500px" ></a>
+
+<p>BASTet is a novel framework for shareable and reproducible data analysis that supports standardized data and analysis interfaces, integrated data storage, data provenance, workflow management, and a broad set of integrated tools. BASTet has been motivated by the critical need to enable MSI researchers to share, reuse, reproduce, validate, interpret, and apply common and new analysis methods.<br></p>
+<br>
+
+<div class = "row-fluid">
+        <div class = "span3" style="text-align:justify;">
+    	    <div>
+                <span class="glyphicon glyphicon-hdd"></span><br>
+                <h5>Data Storage</h5>
+                Save, manage, and share MSI data and analysis results all in a single,
+                open, efficient, and easy-to-use file format based on HDF5 that is
+                natively supported by many common tools and languages.
+            </div>
+        </div>
+         <div class = "span3" style="text-align:justify;">
+    	    <div>
+                <span class="glyphicon glyphicon-import"></span><br>
+                <h5>Common Interfaces</h5>
+                Define your analyses via common, standard interface, making
+                analyses easily accesible to users and enabling developers to
+                build an accesible ecosystem of domain analytics.
+            </div>
+        </div>
+         <div class = "span3" style="text-align:justify;">
+    	    <div>
+                <span class="glyphicon glyphicon-tasks"></span><br>
+                <h5>Workflow Management</h5>
+                Integrate analyses to complex workflows using an easy-to-use API and tools.
+                Manage and share advanced analysis workflows via intuitive Python scripts
+                that users can easily run and customize.
+            </div>
+        </div>
+        <div class = "span3" style="text-align:justify;">
+    	    <div>
+                <span class="glyphicon glyphicon-eye-open"></span><br>
+                <h5>Provenance</h5>
+                Automatically track the provenance of analyses, including inputs, dependencies,
+                outputs, runtime and performance data. Save results in
+                a common file format and easily share, reproduce, or modify
+                analyses.
+            </div>
+        </div>
+</div>
+<br>
+<div class = "row-fluid">
+        <div class = "span3" style="text-align:justify;">
+    	    <div>
+                <span class="glyphicon glyphicon-wrench"></span><br>
+                <h5>Tools and Analytics</h5>
+                Execute analyses and workflows using standard tools,
+                convert MSI data files, log progress, parallelize analyses via MPI,
+                perform advanced data analytics, and many other integrated features.
+            </div>
+        </div>
+       <div class = "span3" style="text-align:justify;">
+    	    <div>
+                <span class="glyphicon glyphicon-send"></span><br>
+                <h5>Integrated with OpenMSI</h5>
+                BASTet serves as the analysis and storage backend for OpenMSI. Integrate new analyses,
+                MSI data formats, and other features with OpenMSI directly via BASTet.
+            </div>
+        </div>
+        <div class = "span3" style="text-align:justify;">
+    	    <div>
+                <span class="glyphicon glyphicon-thumbs-up"></span><br>
+                <h5>Open Source</h5>
+                BASTet is available online at <a href="https://github.com/biorack/BASTet">https://github.com/biorack/BASTet</a>
+            </div>
+        </div>
+       <div class = "span3" style="text-align:justify;">
+    	    <!--<div>-->
+                <!--<span class="glyphicon glyphicon-retweet"></span><br>-->
+                <!--<h5>Analysis Lifecycle</h5>-->
+            <!--</div>-->
+        </div>
+</div>
+
+
+<h3>Sources</h3>
+
+BASTet is available online at <a href="https://github.com/biorack/BASTet">https://github.com/biorack/BASTet</a>
+
+
+<h3>Documentation</h3>
+
+<ul>
+<li>HTML: <a href="https://biorack.github.io/BASTet/">https://biorack.github.io/BASTet/</a>.</li>
+<li>PDF: <a href="https://biorack.github.io/BASTet/_static/bastet_doc.pdf">https://biorack.github.io/BASTet/_static/bastet_doc.pdf</a></li>
+</ul>
+
+<h3>Licence and Copyright</h3>
+
+<ul>
+<li> For the current licence see: <a href="https://github.com/biorack/BASTet/blob/master/license.txt">license.txt</a></li>
+<li> For the current copyright see: <a href="https://github.com/biorack/BASTet/blob/master/copyright.txt">copyright.txt</a></li>
+</ul>
+
+<h3>Publications</h3>
+
+<p>The data format for storage of MSI data is described in the following publication:</p>
+
+<p><em>Oliver Rübel, Annette Greiner, Shreyas Cholia, Katherine Louie, E. Wes Bethel, Trent R. Northen, and Benjamin P. Bowen, "OpenMSI: A High-Performance Web-Based Platform for Mass Spectrometry Imaging" Analytical Chemistry 2013 85 (21), 10354-10361, DOI: 10.1021/ac402540a. <a href="https://openmsi.nersc.gov/site_media/openmsi/images/publications/openmsi_acs_2013.bib">[BibTeX]</a><a href="http://pubs.acs.org/doi/abs/10.1021/ac402540a">[Online at ACS]</a></em></p>
+
+<p>The broader storage, analysis, provenance, and workflow capabilities of BASTet are described in an upcoming publication:</p>
+
+<p><em>Oliver Rübel and Benjamin P. Bowen, "BASTet: Shareable and reproducible analysis and visualization of mass spectrometry imaging data via OpenMSI," submitted March, 2016</em></p>
+
+
+</div>
+<br>
+<br>
+
+
+
+</body>
+
+{% endblock %}

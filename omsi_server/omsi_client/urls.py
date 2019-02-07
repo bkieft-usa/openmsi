@@ -1,0 +1,27 @@
+from django.conf.urls import patterns, url, include
+
+urlpatterns = patterns('',
+    url(r'^$', 'omsi_client.views.index', name='omsi_client.default'),
+    url(r'^index', 'omsi_client.views.index', name='omsi_client.index'),
+    url(r'^viewer', 'omsi_client.views.viewer', name='omsi_client.viewer'),
+    url(r'^news', 'omsi_client.views.news', name='omsi_client.news'),
+    url(r'^publications', 'omsi_client.views.publications', name='omsi_client.publications'),
+    url(r'^about', 'omsi_client.views.about', name='omsi_client.about'),
+    url(r'^uploadHelp', 'omsi_client.views.uploadHelp', name='omsi_client.uploadHelp'),
+    url(r'^terms', 'omsi_client.views.terms', name='omsi_client.terms'),
+    url(r'^contact', 'omsi_client.views.contact', name='omsi_client.contact'),
+    url(r'^login', 'omsi_client.views.login_page' , name='omsi_client.login_page'),
+    url(r'^logout', 'omsi_client.views.logout' , name='omsi_client.logout'),
+    url(r'^test' , 'omsi_client.views.testpage', name='omsi_client.testpage'),
+    url(r'^omsiAccount' , 'omsi_client.views.omsiAccount', name='omsi_client.omsiAccount'),
+    url(r'^bastet', 'omsi_client.views.bastet', name='omsi_client.bastet'),
+)
+
+#(r'^login-test' , 'omsi_client.views.login_test'),
+#(r'^layeredCanvas', 'omsi_client.views.layeredCanvas'),
+#(r'^kineticJSCanvas', 'omsi_client.views.kineticJSCanvas'),
+#(r'^docs', 'omsi_client.views.docs'),
+#(r'^algorithms', 'omsi_client.views.algorithms'),
+#(r'^examples', 'omsi_client.views.examples'),
+#(r'^downloads', 'omsi_client.views.downloads'),
+#(r'^benchmarks', 'omsi_client.views.benchmarks'),

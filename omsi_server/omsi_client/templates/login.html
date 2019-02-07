@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container" >
+    <h1 style="text-align:left;">{{ state }}</h1>
+    {% if next %}
+    <form action="login/?next={{next}}" method="post" >{% csrf_token %}
+        {%else%}
+        <form action="login/" method="post" >{% csrf_token %}
+            {% endif %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Login</h3>
+                </div>
+                <div class="panel-body">
+                    Your use of OpenMSI is governed by the <a href="/openmsi/client/terms.html">OpenMSI Terms of Use</a>. Please do not login or use OpenMSI if you do not agree.
+                    <br>
+                    <br>
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="omsi_inputID">User ID</label>
+                            <input type="text" id="omsi_inputID" class="form-control" name="username" value="{{ username }}"  placeholder="Enter user ID">
+                                </div>
+                        <div class="form-group">
+                            <label for="omsi_inputPassword">Password+OTP</label>
+                            <input type="password" id="omsi_inputPassword" class="form-control" name="password" value="" placeholder="Password">
+                                </div>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+                    <br>
+                    <br>
+                    <a style="float:left;" href="https://nim.nersc.gov/forgotpass.php" target="_newtab">Forgot your password?</a>
+                    <!--<a style="float:right;" href="https://nim.nersc.gov/nersc_account_request.php" target="_newtab">Register for an account</a>-->
+                    <br>
+                </div>
+            </div>
+            <br>
+            
+            <hr>
+        </form>
+</div>
+{% endblock %}

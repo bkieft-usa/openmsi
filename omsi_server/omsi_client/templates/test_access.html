@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.bar text {
+  fill: #fff;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#histoPlotSpectrum{
+     border:3px solid;
+     height:300px;
+     width:600px;
+}
+
+#histoPlotSlice{
+     border:3px solid;
+     height:300px;
+     width:600px;
+}
+
+}
+
+</style>
+
+<body>
+<div class="container">
+
+<h1>Evaluate server performance</h1>
+
+This page is intended as a simple means to evalute the performance of a single file 
+available via the OpenMSI data service currently running at: {{ api_root }}. In order to
+execute a test, please define the file and test parameters below. Each test
+can be executed individually by selecting the corresponding "Start test" button.
+Multiple test may be exectued at the same time. In order to execute all tests simultaneously
+select the "Compute tests simultaneously" button. NOTE: When running
+multiple tests at the same time, then the tests results are no longer independent of each other
+since all data requests share the same network connection to the server.
+
+<form>
+
+<h4>File Parameters </h4>
+File: <input type="text" id="file" name="file" value="20120711_Brain.h5"><br>
+Image size x: <input type="text" id="size_x" name="size_x" value="122"> <br>
+Image size y: <input type="text" id="size_y" name="size_y" value="120"> <br>
+Image size m/z: <input type="text" id="size_z" name="size_z" value="80399"> <br>
+<h4>Test Parameters </h4>
+Repeats: <input type="text" id="repeats" name="repeats" value="50"> <br>
+m/z-range : <input type="text" id="z_range" name="z_range" value="25">
+</form> 
+
+<button class="btn" onclick="testAll()">Compute tests simultaneously</button>
+
+<h2>Spectrum Time: <button class="btn" onclick="testSpectra()">Start test</button> </h2>
+<p id="Spectrum Time"> None </p>
+<div id="histoPlotSpectrum"></div>
+
+<h2>Slice Time: <button class="btn" onclick="testSlice()">Start test</button></h2>
+<p id="Slice Time"> None </p>  
+<div id="histoPlotSlice"></div>
+
+
+</div>
+<br>
+<br>
+<script src="{{ STATIC_URL }}/bootstrap/js/jquery.js"></script>
+<script src="{{ STATIC_URL }}d3.v2.js"></script>
+<script>
+
+    var api_root = '{{ api_root }}';
+
+    var results_spectra = new Array();
+    var current_index_spectra = 0
+    var results_slice = new Array();
+    var current_index_slice = 0
+
+
+    function testAll()
+    {
+        testSpectra()
+        testSlice()
+        // testMetadata()
+    }
+
+    function testSpectra()
+    {
+        server_name = api_root
+        if( server_name.indexOf( '/' , server_name.length-1 ) > '0' ){
+            server_name = api_root.substring(0, api_root.length-1 )
+        }
+        console.log( server_name )
+        file_name   = document.getElementById("file").value
+        num_tests   = parseInt( document.getElementById("repeats").value )
+        size_x      = parseInt( document.getElementById("size_x").value )
+        size_y      = parseInt( document.getElementById("size_y").value )
+        xind = Math.floor(Math.random()*size_x)
+        yind = Math.floor(Math.random()*size_y)
+        textElement=document.getElementById("Spectrum Time")
+        textElement.innerHTML= Math.floor(100*current_index_spectra/num_tests) + "%    Reading: ("+xind+" , "+yind+")"
+        
+        var start_sp = new Date().getTime();
+        $.ajax({
+        url : server_name+'/qspectrum/?file='+file_name+'&expIndex=0&dataIndex=0&row='+xind+'&col='+yind+'&findPeaks=0&format=JSON',
+        async: true,
+        dataType: 'json',
+        success: function (response) {
+            if( current_index_spectra >= num_tests ){
+                current_index_spectra = 0
+                results_spectra = []
+            }
+            end_sp =  new Date().getTime();
+            results_spectra[current_index_spectra] = end_sp - start_sp
+            current_index_spectra = current_index_spectra + 1
+            if( current_index_spectra < num_tests )
+            {
+                testSpectra()
+            }
+            else
+            {
+                finalize_spectra()
+            }
+        }
+        });
+    }
+
+    function finalize_spectra()
+    {
+        x=document.getElementById("Spectrum Time");  // Find the element
+        var sum =0
+        for(var i = 0; i < results_spectra.length; i++){
+            sum += results_spectra[i];
+        }
+        var mean_spectra = sum / results_spectra.length;
+        x.innerHTML= 'Average Time: '+mean_spectra+' ms'    // Change the content
+        
+        plot_histo( results_spectra , "histoPlotSpectrum" )
+    }
+
+
+    function testSlice()
+    {
+        server_name = api_root
+        if( server_name.indexOf( '/' , server_name.length-1 ) > '0' ){
+            server_name = api_root.substring(0, api_root.length-1 )
+        }
+        file_name   = document.getElementById("file").value
+        num_tests   = parseInt( document.getElementById("repeats").value )
+        size_z      = parseInt( document.getElementById("size_z").value )
+        z_range      = parseInt( document.getElementById("z_range").value )
+        zind = Math.floor(Math.random()*(size_z-z_range))
+        textElement=document.getElementById("Slice Time")
+        textElement.innerHTML= Math.floor(100*current_index_slice/num_tests) + "%    Reading: ("+zind+" : "+(zind+z_range)+")"
+        
+        var start_sp = new Date().getTime();
+        $.ajax({
+        url : server_name+'/qslice/?file='+encodeURIComponent(file_name)+'&expIndex=0&dataIndex=0&mz='+zind+':'+(zind+z_range)+'&format=JSON&reduction=max',
+        async: true,
+        dataType: 'json',
+        success: function (response) {
+            if( current_index_slice >= num_tests ){
+                current_index_slice = 0
+                results_slice = []
+            }
+            end_sp =  new Date().getTime();
+            results_slice[current_index_slice] = end_sp - start_sp
+            current_index_slice = current_index_slice + 1
+            if( current_index_slice < num_tests )
+            {
+                testSlice()
+            }
+            else
+            {
+                finalize_slice()
+            }
+        }
+        });
+    }
+
+    function finalize_slice()
+    {
+        x=document.getElementById("Slice Time");  // Find the element
+        var sum =0
+        for(var i = 0; i < results_slice.length; i++){
+            sum += results_slice[i];
+        }
+        var mean_slice = sum / results_slice.length;
+        x.innerHTML= 'Average Time: '+mean_slice+' ms'    // Change the content
+
+        plot_histo( results_slice , "histoPlotSlice" )
+    }
+
+
+    function plot_histo( values , elementId )
+    {
+        document.getElementById(elementId).innerHTML = ""
+        
+        var formatCount = d3.format(",.0f");
+
+        var margin = {top: 10, right: 30, bottom: 30, left: 30},
+            width = 600 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+
+        maxValue = Math.max.apply(null, values)
+        var x = d3.scale.linear()
+            .domain([0 , maxValue])
+            .range([0, width]);
+
+        // Generate a histogram using twenty uniformly-spaced bins.
+        var data = d3.layout.histogram()
+            .bins(x.ticks(50))
+            (values);
+
+        var y = d3.scale.linear()
+            .domain([0, d3.max(data, function(d) { return d.y; })])
+            .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        var svg = d3.select("#"+elementId).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var bar = svg.selectAll(".bar")
+            .data(data)
+        .enter().append("g")
+            .attr("class", "bar")
+            .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+
+        bar.append("rect")
+            .attr("x", 1)
+            .attr("width", x(data[0].dx) - 1)
+            .attr("height", function(d) { return height - y(d.y); });
+
+        bar.append("text")
+            .attr("dy", ".75em")
+            .attr("y", 6)
+            .attr("x", x(data[0].dx) / 2)
+            .attr("text-anchor", "middle")
+            .text(function(d) { return formatCount(d.y); });
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+    }
+
+</script>
+
+
+</body>
+</html>
+
+
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}

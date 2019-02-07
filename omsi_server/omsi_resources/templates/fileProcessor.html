@@ -1,0 +1,268 @@
+{% extends "omsi_client/templates/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+</style>
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+
+<body>
+<div class="container-fluid">
+    <!-- <div class="row"> -->
+    <!-- <div id="activeTextText">
+            <p>Text to be replaced</p>
+                </div>
+            <button id="launchViewer" class="btn btn-small">Viewer</button>
+            <button id="downloadObject" class="btn btn-small">Download</button>
+            <button id="changePermissions" class="btn btn-small">Permissions</button>         -->
+    <div class="span5" id="fileTable">
+        <h3>Files</h3><p>Click on a file to process or check status</p>
+        <ul class="list-group" id="myNavList">
+            <!-- <li class="nav-header"></li> -->
+
+        </ul>
+    </div>
+    <div class="span7" id="processDiv">
+        <h3 id="importFileHeader">Import File</h3>
+
+        <form id="fileInfoForm" role="form">
+            <div class="form-group">
+                <label for="methodsDescription">Methods</label>
+                <textarea rows="3" class="form-control" id="methodsDescription" placeholder="For example, Interaction between E. Coli and B. Subtilis; p53 null tumor treated with rapamycin; whole mouse section to monitor drug bio-availability; etc. Also include author names, references, etc. "></textarea>
+            </div>
+            <div class="form-group">
+                <label for="acquisitionDescription">Acquisition and Instrument Description</label>
+                <textarea rows="3" class="form-control" id="acquisitionDescription" placeholder="For example, matrix= sinapinic acid; instrument=Thermo XL; etc"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="fileNotes">Notes</label>
+                <textarea rows="3" class="form-control" id="fileNotes" placeholder="Any other notes to associate with this file"></textarea>
+            </div>
+
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="analysisChecker_GPF_NMF"> Perform peak-finding and NMF?
+                </label>
+            </div>
+            <!--<div class="checkbox">-->
+                <!--<label>-->
+                    <!--<input type="checkbox" id="analysisChecker_TIC" disabled="true"> <font color="gray"> Perform TIC normalization? (Temporarily Disabled)</font>-->
+                <!--</label>-->
+            <!--</div>-->
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="emailChecker"> Send email notification?
+                </label>
+            </div>
+            <button id="submitButton" type="submit" class="btn btn-default" onclick="submitProcessingJob()">Submit</button>  <button id="statusButton" type="submit" class="btn btn-default" onclick="checkProcessingJob()">Check Job Status</button>
+            <p></p>
+            <p>Check status of all your OpenMSI jobs via the <a href="/openmsi/resources/jobManager.html">Manage Jobs</a> page. You may check the status of all your jobs at NERSC via <a href="http://my.nersc.gov/queues.php?machine=carver&full_name=Carver">myNERSC</a>.</p>
+        </form>
+        <!-- <div id = "loading"><img style="width:200px;display : block;margin : auto;" src="{{ STATIC_URL }}/images/ajax_loader_metal_512.gif" /> -->
+        <!--<div id = "loading"><img style="display : block;margin : auto;" src="{{ STATIC_URL }}/images/ajax-loader.gif" />-->
+        <div id="statusField">
+            <p>No file has been selected.  Select a file from the list to the left.  If no files exist upload a file in a supported format.  Email support team for help.</p>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<br>
+<!-- <div> -->
+
+<script>
+    var api_root = '{{ api_root }}';
+    var current_file = ''
+    var current_jobid = ''
+
+    $(document).ready(function() {
+        $('#fileInfoForm').hide();
+    });
+
+    var myURL = api_root + 'qmetadata/?mtype=filelistRawData';
+    $.getJSON((myURL),function(fileList){
+        var keys = Object.keys(fileList);
+        for (var i=0 ; i<keys.length; i++) {
+            var fileId = keys[i];
+            var filename = fileId.replace(/^.*[\\\/]/, '');
+            $('#myNavList').append('<li style="word-wrap: break-word;"><a id="'+fileId+'" href="#">'+filename+'</a></li>');
+        }
+        sortUnorderedList("myNavList");
+        activateClickers();
+
+    });
+
+
+    function activateClickers()
+    {
+        $('#myNavList li a').click(function(e) {
+            $("#svgDiv svg").fadeTo('slow',0);
+//              processData($(this).attr('id'));
+                current_file = $(this).attr('id')
+                $('#importFileHeader').text("Import File: " + current_file.replace(/^.*[\\\/]/, ''))
+                document.getElementById('statusField').innerHTML = ""
+                $('#statusField').text('')
+                $('#fileInfoForm').show()
+                $('#submitButton').text('Submit')
+                document.getElementById('submitButton').disabled=false
+                document.getElementById('statusButton').disabled=true
+                current_jobid = ''
+        });
+    };
+
+    function checkProcessingJob(showstart){
+        if (current_jobid != ''){
+            showstart = typeof showstart !== 'undefined' ? showstart : 'false';
+            if (showstart == 'true'){
+                document.getElementById("statusButton").innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Estimating Start Time...</bf>";
+            }else{
+                document.getElementById("statusButton").innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Checking Status...</bf>";
+            }
+            document.getElementById('statusButton').disabled=true
+            var myURL = [api_root + 'processing/update/?jobid=' + encodeURIComponent(current_jobid) + '&showstart=' + showstart]
+            var job_status = ''
+            $.getJSON((myURL),function(status){
+                statusMessage = status['message']
+                document.getElementById('statusField').innerHTML = ""
+                if (status['status']!="ERROR"){
+                    if (statusMessage.hasOwnProperty('showstart')) {
+                        $('#statusField').append('<p><b>Estimated Start Time:</b></p>')
+                        estimate = statusMessage['showstart'].split("Estimated")
+                        $('#statusField').append('<ul>')
+                        for (var i = 0; i < estimate.length; i++) {
+                            $('#statusField').append('<li>' + estimate[i]  + '</li>');
+                        }
+                        $('#statusField').append('</ul><br>')
+                    }
+                    $('#statusField').append('<p><b>Job Details:</b></p>')
+                    $('#statusField').append('<ul>')
+                    for (var key in statusMessage) {
+                        if (statusMessage.hasOwnProperty(key)) {
+                            if (key !== 'showstart'){
+                                $('#statusField').append('<li><b>' + key + ": </b>"+ statusMessage[key] + '</li>');
+                            }
+                        }
+                    }
+                    $('#statusField').append('</ul>')
+                    job_status = statusMessage['status']
+                }else{
+                    $('#statusField').append(statusMessage['error'])
+                }
+                document.getElementById("statusButton").innerHTML = "Check Job Status";
+                document.getElementById('statusButton').disabled=false;
+                if (statusMessage['status'] == "Q"){
+                    if (showstart != "true"){
+                        checkProcessingJob("true");
+                    }
+                }
+            });
+        }
+    }
+
+
+    function submitProcessingJob(){
+        var methodsDescription = document.getElementById ('methodsDescription').value;
+        var acquisitionDescription = document.getElementById('acquisitionDescription').value;
+        var fileNotes = document.getElementById('fileNotes').value;
+        var analysisChecker_GPF_NMF = document.getElementById('analysisChecker_GPF_NMF').checked
+//        analysisChecker_ticnorm =  document.getElementById('analysisChecker_TIC').checked;
+        var emailChecker = document.getElementById('emailChecker').checked
+        var myURL = [api_root + 'processing/convert/?file=' + encodeURIComponent(current_file)+ '&nmf=' + analysisChecker_GPF_NMF + '&fpg=' + analysisChecker_GPF_NMF +  '&email=' + emailChecker]; // + '&ticnorm=' + analysisChecker_ticnorm
+        if (methodsDescription)
+            myURL = [myURL + '&methods0=' + encodeURIComponent(methodsDescription)]
+        if (acquisitionDescription)
+            myURL = [myURL + '&instrument0=' + encodeURIComponent(acquisitionDescription)]
+        if (fileNotes)
+            myURL = [myURL + '&notes0=' +  encodeURIComponent(fileNotes)]
+        document.getElementById("submitButton").innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Submitting Job...</bf>";
+        document.getElementById('submitButton').disabled=true
+        $.getJSON((myURL),function(status){
+            if(status['status'] == "OK"){
+                $('#submitButton').text("Job ID: " + status['jobid'])
+                current_jobid = status['jobid']
+                document.getElementById('submitButton').disabled=true
+                document.getElementById('statusButton').disabled=false
+                $('#statusField').append("<p>The job has been submitted. Your job id is: <b>" + current_jobid + "</b></p>")
+                $('#statusField').append("<p>Processing times may vary due to demand for computing resources at NERSC. You may check the current status of your job via the 'Check Job Status' button. Please contact an OpenMSI team member if you have any further questions.</p>")
+            }else{
+                document.getElementById('statusField').innerHTML = "";
+                $('#statusField').text("Error during job submission" + status['error'])
+                $('#submitButton').text('Submit')
+                document.getElementById('submitButton').disabled=false
+                document.getElementById('statusButton').disabled=true
+            }
+        });
+//    $.ajax({
+//        dataType: 'json',
+//        url: myURL,
+//        success: function( flare ) {
+//
+//                flare.x0 = 0;
+//                flare.y0 = 0;
+//                update( root = flare );
+//                $("#loading").hide();
+//                $("#svgDiv svg").fadeTo('slow',1);
+//        },
+//        error: function(xhr, status, error) {
+//            // check status && error
+//            console.log('ERROR')
+//            console.log(xhr.status);
+//        }
+//    });
+    }
+
+    function sortUnorderedList(ul, sortDescending) {
+        if(typeof ul == "string")
+            ul = document.getElementById(ul);
+
+        // Idiot-proof, remove if you want
+        if(!ul) {
+            alert("The UL object is null!");
+            return;
+        }
+
+        // Get the list items and setup an array for sorting
+        var lis = ul.getElementsByTagName("LI");
+        var vals = [];
+
+        // Populate the array
+        for(var i = 0, l = lis.length; i < l; i++)
+            vals.push(lis[i].innerHTML);
+
+        // Sort it
+        vals.sort();
+
+        // Sometimes you gotta DESC
+        if(sortDescending)
+            vals.reverse();
+
+        // Change the list on the page
+        for(var i = 0, l = lis.length; i < l; i++)
+            lis[i].innerHTML = vals[i];
+    }
+
+</script>
+</body>
+
+{% endblock %}

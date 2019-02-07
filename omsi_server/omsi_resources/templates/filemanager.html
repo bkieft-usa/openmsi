@@ -1,0 +1,339 @@
+{% extends "omsi_client/templates/base.html" %}
+{% block content %}
+
+<style type="text/css">
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+    .twitter-typeahead{ float:left; width:100%}
+    .input-group .twitter-typeahead .form-control:not(:first-child):not(:last-child) {
+  border-radius: 4px 0px 0px 4px;
+}
+/*#scrollable-dropdown-menu .tt-dropdown-menu {*/
+    /*width:400px;*/
+  /*max-height: 450px;*/
+  /*overflow-y: auto;*/
+/*}*/
+
+.tt-query {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+    color: #999
+}
+
+.tt-dropdown-menu {
+    /*width: 200px;*/
+    margin-top: 12px;
+    padding: 4px 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+    padding: 3px 20px;
+    font-size: 14px;
+    line-height: 16px;
+}
+
+.tt-suggestion.tt-is-under-cursor {  UPDATE: newer versions use .tt-suggestion.tt-cursor
+    color: #fff;
+    background-color: #0097cf;
+}
+
+.tt-suggestion p {
+    margin: 0;
+}
+
+</style>
+            <script src="{{ STATIC_URL }}/typeahead.bundle.js"></script>
+
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+
+<div class="modal fade" id="flareLongTextModal" >
+    <!--;overflow-y:scroll;-->
+    <div class="modal-dialog modalFlare" style="width:740px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h3>Description</h3>
+            </div>
+            <div class="modal-body" >
+                          <p id="flareLongTextText" ></p>
+
+    <!--<a href="#" class="btn" data-dismiss="modal">Close</a>-->
+            </div>
+            <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid">
+    <h3 style="text-align:center;">{{file}}</h3>
+    <hr>
+</div>
+<div class="container-fluid" >
+
+<div class="row-fluid">
+
+    <div class="span4" style="margin-left:20px;">
+        <h3>Permissions:</h3>
+        <table class="table table-hover table-condensed table-bordered" id="currentPermissionsTable">
+            <tbody>
+            <tr class="active">
+                <th>Name</th>
+                <th>ID</th>
+                <th>Permission</th>
+            </tr>
+            </tbody>
+        </table>
+
+        <form method="post" id="permForm" action="" >
+            {% csrf_token %}
+            {{ form }}
+        </form>
+
+        <h3>Add new permission:</h3>
+        <div class="input-group" id="scrollable-dropdown-menu">
+            <input id="usernameBox" class="typeahead form-control" type="text" placeholder="First Name, Last Name, or Username">
+
+<div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action <span class="caret"></span></button>
+        <ul id="newPermChoice" class="dropdown-menu dropdown-menu-right" role="menu">
+          <li><a href="#">View</a></li>
+          <li><a href="#">Edit</a></li>
+            <li><a href="#">Owner</a></li>
+
+        </ul>
+      </div><!-- /btn-group -->
+</div>
+
+
+        <!--<input style="float:right;" onClick="subNewPermClick()" type="submit" value="Submit" />-->
+
+
+    </div>
+
+    <div class="span7">
+            <h3>Launch viewer and explore this file:</h3><p>Click on the grey bars to show/hide content</p>
+            <!-- <div id = "loading"><img style="width:200px;display : block;margin : auto;" src="{{ STATIC_URL }}/images/ajax_loader_metal_512.gif" /> -->
+            <div id = "loading"><img style="display : block;margin : auto;" src="{{ STATIC_URL }}/images/ajax-loader.gif" /></div>
+
+        <div id="svgDivFlare"></div>
+
+
+    </div>
+</div>
+</div>
+
+<script src="{{ STATIC_URL }}makeFileFlare.js"></script>
+
+<script type="text/javascript">
+
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substrRegex;
+    // an array that will be populated with substring matches
+    matches = [];
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        // the typeahead jQuery plugin expects suggestions to a
+        // JavaScript object, refer to typeahead docs for more info
+        matches.push({ value: str });
+      }
+    });
+    cb(matches);
+  };
+};
+
+
+//http://stackoverflow.com/questions/1052531/get-user-group-in-a-view
+//http://stackoverflow.com/questions/14458179/django-add-multiple-user-to-one-group-in-admin-interface
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-39099473-1']);
+_gaq.push(['_trackPageview']);
+
+
+var api_root = '{{ api_root }}';
+
+
+(function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+userInfo =  {{ userInfo|safe }}
+
+var states = [];
+for (i = 0; i < userInfo['users']['username'].length; i++) {
+    str = userInfo['users']['first_name'][i] + " " + userInfo['users']['last_name'][i] + ": " + userInfo['users']['username'][i];
+    states.push(str);
+}
+
+$(document).ready(function() {
+
+
+    $('#scrollable-dropdown-menu .typeahead').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+},
+{
+  name: 'states',
+  displayKey: 'value',
+  source: substringMatcher(states)
+});
+
+    $('#newPermChoice li').click(function (e) {
+//        console.log($(this).text())
+        var str = $('#usernameBox').val();
+        var a = str.split(" ");
+        var idSubText = "id_"+$(this).text().toLowerCase()+"_users";
+        var usernameText = a.pop();
+
+        console.log($('#permForm'))
+    var selectedVals   = [];
+    $('#'+idSubText+' option:selected').each(function()
+    {
+        selectedVals.push($(this).text());
+
+    });
+    if ($.inArray(usernameText,selectedVals) == -1) {
+        selectedVals.push(usernameText);
+    }
+
+    var idxVals = [];
+    var idxTxt = [];
+    $('#'+idSubText+' option').each(function()
+    {
+        idxVals.push($(this).val());
+        idxTxt.push($(this).text());
+    });
+
+    var foundIdx = $.inArray(usernameText,idxTxt);
+    $("#"+idSubText+" option[value='"+idxVals[foundIdx]+"']").prop('selected', true);
+    $("#permForm").submit();
+    $('#usernameBox').val("")
+
+});
+
+    $('#permForm').hide();
+//        var temp = {{ user.groups.all.0 }}
+//        console.log(userInfo.groups);
+    var options = $("#newUsernameSelect");
+    $.each(userInfo.users.username, function() {
+        options.append($("<option />").val(this).text(this));
+    });
+
+    userInfo.permissions.ownerUsers.forEach(function(entry) {
+        var found = $.inArray(entry, userInfo.users.username);
+//        <button id=id_owner_users;'+entry+' onClick="remPermClick(this.id)" style="float:right;" type="button" class="btn btn-danger btn-xs">X</button>
+        $('#currentPermissionsTable tbody').append('<tr><td>'+userInfo.users.first_name[found]+' '+userInfo.users.last_name[found]+'</td><td>'+entry+'</td><td>Owner</td></tr>');
+
+    });
+    userInfo.permissions.ownerGroups.forEach(function(entry) {
+        var found = $.inArray(entry, userInfo.users.username);
+        $('#currentPermissionsTable tbody').append('<tr><td>Group</td><td>'+entry+'</td><td>Owner<button id=id_owner_groups;'+entry+' onClick="remPermClick(this.id)" style="float:right;" type="button" class="btn btn-danger btn-xs">X</button></td></tr>');
+    });
+    userInfo.permissions.viewUsers.forEach(function(entry) {
+        var found = $.inArray(entry, userInfo.users.username);
+        $('#currentPermissionsTable tbody').append('<tr><td>'+userInfo.users.first_name[found]+' '+userInfo.users.last_name[found]+'</td><td>'+entry+'</td><td>Viewer<button id=id_view_users;'+entry+' onClick="remPermClick(this.id)" style="float:right;" type="button" class="btn btn-danger btn-xs">X</button></td></tr>');
+    });
+    userInfo.permissions.viewGroups.forEach(function(entry) {
+        var found = $.inArray(entry, userInfo.users.username);
+        $('#currentPermissionsTable tbody').append('<tr><td>Group</td><td>'+entry+'</td><td>Viewer<button id=id_view_groups;'+entry+' onClick="remPermClick(this.id)" style="float:right;" type="button" class="btn btn-danger btn-xs">X</button></td></tr>');
+    });
+    userInfo.permissions.editUsers.forEach(function(entry) {
+        var found = $.inArray(entry, userInfo.users.username);
+        $('#currentPermissionsTable tbody').append('<tr><td>'+userInfo.users.first_name[found]+' '+userInfo.users.last_name[found]+'</td><td>'+entry+'</td><td>Edit<button id=id_edit_users;'+entry+' onClick="remPermClick(this.id)" style="float:right;" type="button" class="btn btn-danger btn-xs">X</button></td></tr>');
+    });
+    userInfo.permissions.editGroups.forEach(function(entry) {
+        var found = $.inArray(entry, userInfo.users.username);
+        $('#currentPermissionsTable tbody').append('<tr><td>Group</td><td>'+entry+'</td><td>Edit<button id=id_edit_groups;'+entry+' onClick="remPermClick(this.id)" style="float:right;" type="button" class="btn btn-danger btn-xs">X</button></td></tr>');
+    });
+                $('#loading').show();
+
+    getflare("{{ file }}");
+})
+
+function remPermClick(clickedId){
+    var clickStr = clickedId.split(";");
+    console.log(clickStr[0])//This is the id of the form
+    console.log(clickStr[1])//This is the value index of the form
+    var idxVals = $('#'+clickStr[0]).val()
+    var idxTxt = [];
+    for (var i in idxVals)
+    {
+        console.log(idxVals[i])
+        idxTxt.push($("#"+clickStr[0]+" option[value='"+idxVals[i]+"']").text())
+    }
+    var foundIdx = $.inArray(clickStr[1],idxTxt);
+    idxVals.splice(foundIdx,1);
+    $('#'+clickStr[0]).val(idxVals);
+    $("#permForm").submit();
+}
+
+function subNewPermClick(){
+    console.log('clicked')
+    var idSubText = "id_"+$('#newPermChoice option:selected').val()+"_users";
+    var usernameText = $('#usernameBox').val(); //from pulldown in new permission table
+    console.log(usernameText)
+    console.log(idSubText)
+    var selectedVals   = [];
+    $('#'+idSubText+' option:selected').each(function()
+    {
+        selectedVals.push($(this).text());
+    });
+    if ($.inArray(usernameText,selectedVals) == -1) {
+        selectedVals.push(usernameText);
+    }
+
+    var idxVals = [];
+    var idxTxt = [];
+    $('#'+idSubText+' option').each(function()
+    {
+
+        idxVals.push($(this).val());
+        idxTxt.push($(this).text());
+    });
+    var foundIdx = $.inArray(usernameText,idxTxt);
+    $("#"+idSubText+" option[value='"+idxVals[foundIdx]+"']").prop('selected', true);
+//    $("#permForm").submit();
+}
+
+
+
+
+
+
+</script>
+
+{% endblock %}

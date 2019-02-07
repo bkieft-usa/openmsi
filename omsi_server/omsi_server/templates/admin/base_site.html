@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'OpenMSI Site Admin' %}{% endblock %}
+
+{% block extrastyle %}
+<style type="text/css">
+/* HEADER */
+
+#header {
+    background: #acbeca;
+    color: #06003f;
+    overflow: hidden;
+}
+
+#header a:link, #header a:visited {
+    color: #ffffff; 
+    font-weight: bold;
+}
+
+#branding h1 {
+    padding: 0 10px;
+    font-size: 18px;
+    margin: 8px 0;
+    font-weight: normal;
+    color: #06003f;
+}
+
+#user-navigation {
+    position: relative;
+    top: 0;
+    right: 0;
+    padding: 0.0em 10px;
+    font-size: 11px;
+    text-align: left;
+}
+
+#user-navigation a:link, #header a:visited {
+    color: #ffffff; 
+    font-weight: bold;
+}
+
+</style>
+{% endblock %}
+
+{% block branding %}
+<a href="{{ STATIC_URL }}project_logo.pdf"><img src="{{ STATIC_URL }}project_logo_small.png" style="float:left;margin:5px 5px 5px 5px;" ></a> 
+{% if user.is_active and user.is_staff %}
+   <h1>System Administration</h1>
+{% endif %}
+{% endblock %}
+
+{% block userlinks %}
+      <br>
+      <div id="user-navigation">
+      <a href=" https://www.google.com/analytics/web">Page Analytics</a> /
+      {{ block.super }} 
+      </div>
+ {% endblock %}
+
+

@@ -1,0 +1,43 @@
+{% extends "omsi_client/templates/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .node rect {
+        cursor: pointer;
+        fill: #EFF2FB;
+        stroke-opacity: .5;
+        stroke: #848482;
+        stroke-width: 1px;
+    }
+
+    .node text {
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2px;
+    }
+
+</style>
+<script src="{{ STATIC_URL }}d3.v3.min.js"></script>
+
+<body>
+<div class="container">
+<div>
+<h3>Upload a data file</h3><p>Use the file transfer interface below.  For help, click <a href="/openmsi/client/uploadHelp.html">here</a>.</p>
+    <p>You will get a confirmation email once the transfer completes.  After that, click on <a href="/openmsi/resources/fileProcessor.html">Import File</a> to bring the data into OpenMSI.</p>
+</div>
+    </div>
+</div>
+    <iframe height="1025" width="100%" src="https://globus.nersc.gov/xfer/StartTransfer#dest=nersc#dtn/project/projectdirs/openmsi/original_data/{{user.username}}" ></iframe>
+
+<!--</div>-->
+
+</body>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+version: '2'
+services:
+  kv:
+     cap_add:
+     - CHOWN
+     image: scanon/fixdir
+     command: 55710 /data
+     cap_drop:
+     - ALL
+     volumes:
+     - api.openmsi-nersc:/data
+     labels:
+       io.rancher.container.pull_image: always
+       io.rancher.container.start_once: 'true'
+
+  app:
+    image: registry.spin.nersc.gov/canon/openmsi:dev
+    stdin_open: true
+    volumes:
+    - /global/project/projectdirs/openmsi:/project:ro
+    - api.openmsi-nersc:/data
+    user: 55710:55809
+    tty: true
+    command:
+    - /bin/bash
+    labels:
+      io.rancher.container.pull_image: always
+    cap_drop:
+    - ALL
+
+  web:
+    image: registry.spin.nersc.gov/canon/openmsi:dev
+    cap_drop:
+    - ALL
+    volumes:
+    - api.openmsi-nersc:/data
+    - /global/project/projectdirs/openmsi/omsi_data:/data/openmsi/omsi_data:ro
+    - /global/project/projectdirs/openmsi/:/project/projectdirs/openmsi/:ro
+    tty: true
+    environment:
+      API_ROOT: https://openmsi.nersc.gov/
+    ports:
+    - 60003:8000/tcp
+    user: 55710:55809
+    labels:
+      io.rancher.container.pull_image: always
+
+volumes:
+  api.openmsi-nersc:
+    external: true
+    driver: rancher-nfs

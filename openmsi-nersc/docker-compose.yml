@@ -5,7 +5,7 @@ volumes:
     driver: rancher-nfs
 services:
   app:
-    image: registry.spin.nersc.gov/canon/openmsi:dev
+    image: registry.spin.nersc.gov/openmsi/openmsi:dev
     cap_drop:
     - ALL
     stdin_open: true
@@ -19,7 +19,7 @@ services:
     labels:
       io.rancher.container.pull_image: always
   web:
-    image: registry.spin.nersc.gov/canon/openmsi:dev
+    image: registry.spin.nersc.gov/openmsi/openmsi:dev
     environment:
       API_ROOT: https://openmsi.nersc.gov/
     cap_drop:

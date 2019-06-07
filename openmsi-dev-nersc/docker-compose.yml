@@ -14,7 +14,7 @@ services:
        io.rancher.container.start_once: 'true'
 
   app:
-    image: registry.spin.nersc.gov/canon/openmsi:dev
+    image: registry.spin.nersc.gov/metatlas/openmsi:dev
     stdin_open: true
     volumes:
     - /global/project/projectdirs/openmsi:/project:ro
@@ -29,7 +29,7 @@ services:
     - ALL
 
   web:
-    image: registry.spin.nersc.gov/canon/openmsi:dev
+    image: registry.spin.nersc.gov/metatlas/openmsi:dev
     cap_drop:
     - ALL
     volumes:

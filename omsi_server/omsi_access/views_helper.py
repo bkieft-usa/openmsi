@@ -1452,10 +1452,7 @@ def get_manager_URL(request, omsiObj):
     managerURL = None
     queryParams = {}
     if isinstance(omsiObj, omsi_file):
-        if request:
-            managerURL = request.build_absolute_uri(reverse('omsi_resources.filemanager'))
-        else:
-            managerURL = settings.API_ROOT.rstrip("/") + "/" + reverse('omsi_resources.filemanager').lstrip("/")
+        managerURL = settings.API_ROOT.rstrip("/") + "/" + reverse('omsi_resources.filemanager').lstrip("/")
         queryParams['file'] = omsi_file_common.get_h5py_object(omsiObj).file.filename
     if managerURL is not None:
         a = QueryDict('')
@@ -1482,10 +1479,7 @@ def get_download_URL(request, omsiObj):
             * String with the download URL
             * None in case no download URL can be determined for the given object.
     """
-    if request:
-        qcubeURL = request.build_absolute_uri(reverse('omsi_access.qcube'))
-    else:
-        qcubeURL = settings.API_ROOT.rstrip("/") + "/" + reverse('omsi_access.qcube').lstrip("/")
+    qcubeURL = settings.API_ROOT.rstrip("/") + "/" + reverse('omsi_access.qcube').lstrip("/")
     queryParams = {}
     if isinstance(omsiObj, omsi_file):
         h5pyObj = omsi_file_common.get_h5py_object(omsiObj)
@@ -1529,10 +1523,7 @@ def get_viewer_URL(request, omsiObj):
     if not supportsViewer:
         return None
 
-    if request:
-        viewerURL = request.build_absolute_uri(reverse('omsi_client.viewer'))
-    else:
-        viewerURL = settings.API_ROOT.rstrip("/") + "/" + reverse('omsi_client.viewer').lstrip("/")
+    viewerURL = settings.API_ROOT.rstrip("/") + "/" + reverse('omsi_client.viewer').lstrip("/")
     h5pyObj = omsi_file_common.get_h5py_object(omsiObj)
     path = h5pyObj.name
     sp = path.split("/")

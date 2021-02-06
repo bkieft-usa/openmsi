@@ -37,7 +37,7 @@ API_ROOT = os.environ.get("API_ROOT", "https://openmsi.nersc.gov/openmsi/")
 DEBUG = True
 
 """Restrict the domains that are allowed to access the site. This is also needed when DEBUG is False"""
-ALLOWED_HOSTS = [".openmsi.nersc.gov", ".openmsi-dev.nersc.gov"]
+ALLOWED_HOSTS = ["openmsi.nersc.gov", "openmsi-dev.nersc.gov"]
 
 """Folder for storing temporary data files. Set this variable to ensure all temporary data is generated at the given location. This is useful to ensure that all temporary data can be easily cleaned up. The server implementation tries to clean up files as much as possible but, e.g., in case of crashes etc. that may not always be possible. If set to None then temporary files will be created using Pythons default behavior"""
 TEMPORARY_DATAPATH = "/data/openmsi/omsi_temp"

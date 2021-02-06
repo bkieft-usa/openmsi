@@ -1,0 +1,25 @@
+﻿apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    field.cattle.io/creatorId: u-m44hajazl7
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+    volume.beta.kubernetes.io/storage-provisioner: cluster.local/3par-nfs-client-provisioner
+  creationTimestamp: null
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    cattle.io/creator: norman
+  name: sqlite
+  selfLink: /api/v1/namespaces/openmsi/persistentvolumeclaims/sqlite
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 512Mi
+  storageClassName: nfs-client
+  volumeMode: Filesystem
+  volumeName: pvc-bdd9b925-134d-4e7c-98dd-c417f4458fb9
+status: {}

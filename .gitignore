@@ -1,0 +1,4 @@
+*.swp
+.tls.*
+deploy_tmp/
+lib/

@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    cattle.io/creator: norman
+  name: lb
+spec:
+  rules:
+  - host: {{LB_FQDN}}
+    http:
+      paths:
+      - backend:
+          serviceName: webserver
+          servicePort: web-webserver
+  - host: {{OPENMSI_FQDN}}
+    http:
+      paths:
+      - backend:
+          serviceName: webserver
+          servicePort: web-webserver
+  tls:
+  - hosts:
+    - {{OPENMSI_FQDN}}
+    secretName: openmsi-cert
+status:
+  loadBalancer: {}

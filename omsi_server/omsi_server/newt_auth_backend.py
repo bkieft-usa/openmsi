@@ -7,10 +7,10 @@ import random
 class NEWT(object):
 
     def __init__(self):
-        self.auth_newt_groups = ['m1541']
+        self.auth_newt_groups = [u'm1541']
         self.newt_base_url = "https://newt.nersc.gov/newt"
         self.newt_auth_url = self.newt_base_url+"/auth"
-        self.newt_account_url = self.newt_base_url+"/account"
+        self.newt_account_url = self.newt_base_url+"/account/iris"
         self.newt_logout_url = self.newt_base_url+"/logout"
         self.newt_queue_url = self.newt_base_url+"/queue"
 
@@ -36,26 +36,27 @@ class NEWT(object):
         #import pdb; pdb.set_trace()
         s = requests.Session()
         r = s.post(self.newt_auth_url, {"username": username, "password": password})
-        if r.status_code != 200:
+        try:
+ 	    r.raise_for_status()
+        except HTTPError:
             return None
         result = r.json()
         if not result['auth']:
             return None
+        newt_sessionid = result['newt_sessionid']
 
         #NEWT session id for the user. We can use this to run at NERSC as the user.
         if request:
-            request.session['newt_sessionid'] = result['newt_sessionid']
+            request.session['newt_sessionid'] = newt_sessionid
 
         #If user is authenticated via NEWT, check if the user exists
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             #If the user does not exists check whether they are in the required repos
-            group_info = s.get(self.newt_account_url+"/user/"+username+"/groups")
-            groups = [g['gname'] for g in group_info.json()['items']]
             #Check if the user in a auth group
             in_auth_group = False
-            for i in groups:
+            for i in self.get_groups(newt_sessionid, username):
                 if i in self.auth_newt_groups:
                     in_auth_group = True
                     break
@@ -67,29 +68,14 @@ class NEWT(object):
                 user.is_active = True
                 user.is_staff = False
                 user.is_superuser = False
-                user.save()
-                # Try to retrieve additional information about the user from NEWT
-                # Get the users base info to the person id of the user
-                user_info = s.get(self.newt_account_url+"/user/"+username)
+                user_attributes = self.get_user_attributes(newt_sessionid, username)
                 try:
-                    person_id = None
-                    for uinfo in user_info.json()['items']:
-                        if uinfo['uname'] == username:
-                            person_id = uinfo['person_id']
-                            break
-                except:
-                    person_id = None
-                # If we have a person id, then retrieve the person related data from NEWT and add it to the user
-                if person_id is not None:
-                    try:
-                        person_info = s.get(self.newt_account_url + "/person/id/" + str(person_id))
-                        person_description = person_info.json()['items'][0]
-                        user.email = person_description['email']
-                        user.first_name = person_description['firstname']
-                        user.last_name = person_description['lastname']
-                        user.save()
-                    except:
-                        pass
+                    user.email = user_attributes['email']
+                    user.first_name = user_attributes['firstname']
+                    user.last_name = user_attributes['lastname']
+                except KeyError:
+                    pass
+                user.save()
             else:
                 return None
         return user
@@ -99,6 +85,42 @@ class NEWT(object):
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
+
+    def get_groups(self, session_id, user_id):
+        """
+	Get all unix group names for the user_id
+
+        :param session_d: NEWT session id
+        :param user_id: unix username to query
+        :returns: list of unix group names or empty list if query fails
+        """
+        s = requests.Session()
+        query_function = 'groups(username: \\"'+user_id+'\\") {name}'
+        cookies = {"newt_sessionid": session_id}
+        r = s.post(self.newt_account_url, {'query':  query_function}, cookies=cookies)
+        try:
+ 	    r.raise_for_status()
+        except HTTPError:
+ 	    return []
+        return [x['name'] for x in r.json()['data']['newt']['groups']]
+
+    def get_user_attributes(self, session_id, user_id):
+        """
+	Get email address, first name and last name for the user_id
+
+        :param session_d: NEWT session id
+        :param user_id: unix username to query
+        :returns: dict with keys email, lastname, firstname or empty dict if query fails
+        """
+        s = requests.Session()
+        query_function = 'user(username: \\"'+user_id+'\\") {email, lastname, firstname}'
+        cookies = {"newt_sessionid": session_id}
+        r = s.post(self.newt_account_url, {'query':  query_function}, cookies=cookies)
+        try:
+ 	    r.raise_for_status()
+        except:
+ 	    return {}
+        return(r.json()['data']['newt']['user'])
 
     @staticmethod
     def run_command(session_id, machine_name, command):

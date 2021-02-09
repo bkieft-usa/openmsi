@@ -15,6 +15,7 @@ ROOT_BACKUP_DIR="/global/cfs/cdirs/openmsi/omsi_db/backups/"
 
 # initialize variables to avoid errors
 OMSI_IMAGE=""
+BACKUP_IMAGE=""
 export API_ROOT="https://openmsi.nersc.gov/"
 DEV=0
 
@@ -27,16 +28,18 @@ TIMESTAMP=
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
     -a|--api) export API_ROOT="$2"; shift ;;
+    -b|--backup) export BACKUP_IMAGE="$2"; shift ;;
     -d|--dev) DEV=1 ;;
-    -i|--image) export OMSI_IMAGE="$2"; shift ;;
+    -w|--webserver) export OMSI_IMAGE="$2"; shift ;;
     -t|--timestamp) TIMESTAMP="$2"; shift ;;
     -h|--help)
         echo -e "$0 [options]"
         echo ""
         echo "   -h, --help          show this command refernce"
 	echo "   -a, --api           API root url (default: https://openmsi.nersc.gov/)"
+	echo "   -b, --backup        source of backup docker image (required)"
 	echo "   -d, --dev           deploy development instance instead of production"
-	echo "   -i, --image         source of openmsi docker image (required)"
+	echo "   -w, --webserver     source of openmsi webserver docker image (required)"
 	echo "   -t, --timestamp     timestamp of the backup to use (defaults to most recent)"
         exit 0
         ;;
@@ -88,7 +91,8 @@ if [[ $TIMESTAMP == '' ]]; then
 fi
 
 required_flag_or_error "$API_ROOT " "You are required to supply the API_ROOT url via -a or --api."
-required_flag_or_error "$OMSI_IMAGE" "You are required to supply a source for the openmsi docker image via -i or --image."
+required_flag_or_error "$OMSI_IMAGE" "You are required to supply a source for the openmsi docker image via -w or --webserver."
+required_flag_or_error "$BACKUP_IMAGE" "You are required to supply a source for the backup docker image via -b or --backup."
 required_flag_or_error "$TIMESTAMP" "You are required to supply a backup timestamp via -t or --timestamp."
 
 # relative to the global filesystem:
@@ -109,10 +113,12 @@ if [[ $DEV -eq 1 ]]; then
   PROJECT="c-fwj56:p-lswtz" # development:m2650
   export LB_FQDN="lb.openmsi.development.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi-dev.nersc.gov"
+  export PREFIX="openmsi-dev_sqlite_"
 else
   PROJECT="c-tmq7p:p-gqfz8" # production cluster for m2650. Run 'rancher context switch' to get other values.
   export LB_FQDN="lb.openmsi.production.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi.nersc.gov"
+  export PREFIX="openmsi_sqlite_"
 fi
 
 CERT_FILE="${SCRIPT_DIR}/.tls.cert"
@@ -203,5 +209,8 @@ rancher kubectl apply $FLAGS -f "${DEPLOY_TMP}/webserver.yaml"
 
 ## Create load balancer
 rancher kubectl apply $FLAGS -f "${DEPLOY_TMP}/lb.yaml"
+
+## Create cron job to backup sqlite DB to /global filesystem
+rancher kubectl apply $FLAGS -f "${DEPLOY_TMP}/backup.yaml"
 
 rm -rf "${DEPLOY_TMP}"

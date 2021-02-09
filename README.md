@@ -7,7 +7,7 @@ The software behind the mass spec portal at [openmsi.nersc.gov](https://openmsi.
 1. Git clone this repo to your local machine:
   - `git clone https://github.com/biorack/openmsi_web`
 2. Build and push images to [registry.spin.nersc.gov](https://registry.spin.nersc.gov):
-  - `./openmsi_web/build.sh`
+  - `./openmsi_web/build.sh --all`
 3. Git clone this repo to a cori login node:
   - `git clone https://github.com/biorack/openmsi_web`
 4. In the root directory of the openmsi_web repo, create the following files containing your TLS private key and certificate ((w/ issuer after, PEM encoded):

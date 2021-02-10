@@ -1,13 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    field.cattle.io/creatorId: u-m44hajazl7
-    nersc.gov/gid: "94014"
-    nersc.gov/gids: 124,55809,55731,57331,57338,60734,72473,5242,76870,94014
-    nersc.gov/uid: "94014"
-    nersc.gov/username: wjholtz
-  creationTimestamp: null
   generation: 1
   labels:
     cattle.io/creator: norman
@@ -29,9 +22,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations:
-        cattle.io/timestamp: "2021-01-11T18:22:26Z"
-      creationTimestamp: null
       labels:
         workload.user.cattle.io/workloadselector: deployment-openmsi-restore
     spec:

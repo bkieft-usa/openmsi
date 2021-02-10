@@ -1,15 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    deployment.kubernetes.io/revision: "4"
-    field.cattle.io/creatorId: u-m44hajazl7
-    field.cattle.io/publicEndpoints: "null"
-    nersc.gov/gid: "94014"
-    nersc.gov/gids: 124,57331,57338,60734,72473,5242,94014
-    nersc.gov/uid: "94014"
-    nersc.gov/username: wjholtz
-  creationTimestamp: null
   generation: 1
   labels:
     cattle.io/creator: norman
@@ -31,9 +22,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations:
-        cattle.io/timestamp: "2021-01-04T20:15:34Z"
-      creationTimestamp: null
       labels:
         workload.user.cattle.io/workloadselector: deployment-openmis-get-cert
     spec:

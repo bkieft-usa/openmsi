@@ -27,9 +27,9 @@ RUN micromamba install -y -n base -c anaconda -c conda-forge -c bioconda \
         virtualenv=16.0.0 && \
     rm /opt/conda/pkgs/cache/*
 
-# Django cannot be installed from conda as a old enough version does
-# not exist in a the major conda repositories
-RUN /opt/conda/bin/pip install django==1.6.11
+# Django and WhiteNosie cannot be installed from conda as a old enough versions
+# do not exist in the major conda repositories
+RUN /opt/conda/bin/pip install django==1.6.11 whitenoise==2.0.6
 
 COPY --from=clone /BASTet /BASTet
 COPY ./omsi_server /src/omsi_server

@@ -79,8 +79,8 @@
             <p></p>
             <p>Check status of all your OpenMSI jobs via the <a href="/openmsi/resources/jobManager.html">Manage Jobs</a> page. You may check the status of all your jobs at NERSC via <a href="http://my.nersc.gov/queues.php?machine=carver&full_name=Carver">myNERSC</a>.</p>
         </form>
-        <!-- <div id = "loading"><img style="width:200px;display : block;margin : auto;" src="{{ STATIC_URL }}/images/ajax_loader_metal_512.gif" /> -->
-        <!--<div id = "loading"><img style="display : block;margin : auto;" src="{{ STATIC_URL }}/images/ajax-loader.gif" />-->
+        <!-- <div id = "loading"><img style="width:200px;display : block;margin : auto;" src="{{ STATIC_URL }}images/ajax_loader_metal_512.gif" /> -->
+        <!--<div id = "loading"><img style="display : block;margin : auto;" src="{{ STATIC_URL }}images/ajax-loader.gif" />-->
         <div id="statusField">
             <p>No file has been selected.  Select a file from the list to the left.  If no files exist upload a file in a supported format.  Email support team for help.</p>
         </div>
@@ -135,9 +135,9 @@
         if (current_jobid != ''){
             showstart = typeof showstart !== 'undefined' ? showstart : 'false';
             if (showstart == 'true'){
-                document.getElementById("statusButton").innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Estimating Start Time...</bf>";
+                document.getElementById("statusButton").innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Estimating Start Time...</bf>";
             }else{
-                document.getElementById("statusButton").innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Checking Status...</bf>";
+                document.getElementById("statusButton").innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Checking Status...</bf>";
             }
             document.getElementById('statusButton').disabled=true
             var myURL = [api_root + 'processing/update/?jobid=' + encodeURIComponent(current_jobid) + '&showstart=' + showstart]
@@ -195,7 +195,7 @@
             myURL = [myURL + '&instrument0=' + encodeURIComponent(acquisitionDescription)]
         if (fileNotes)
             myURL = [myURL + '&notes0=' +  encodeURIComponent(fileNotes)]
-        document.getElementById("submitButton").innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Submitting Job...</bf>";
+        document.getElementById("submitButton").innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Submitting Job...</bf>";
         document.getElementById('submitButton').disabled=true
         $.getJSON((myURL),function(status){
             if(status['status'] == "OK"){

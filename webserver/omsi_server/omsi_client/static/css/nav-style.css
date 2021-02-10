@@ -128,27 +128,6 @@ ul#leftNavigation li a span{
 /* filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);*/
 /*    text-shadow: 0 -1px 1px #fff;      */
 }
-/*ul#navigation .home a{
-    background-image: url(../images/home.png);
-}
-ul#navigation .about a      {
-    background-image: url(../images/id_card.png);
-}
-ul#navigation .search a      {
-    background-image: url(../images/search.png);
-}
-ul#navigation .podcasts a      {
-    background-image: url(../images/ipod.png);
-}
-ul#navigation .rssfeed a   {
-    background-image: url(../images/rss.png);
-}
-ul#navigation .photos a     {
-    background-image: url(../images/camera.png);
-}
-ul#navigation .contact a    {
-    background-image: url(../images/mail.png);
-}*/
 
 #nav {
     width: 100%;

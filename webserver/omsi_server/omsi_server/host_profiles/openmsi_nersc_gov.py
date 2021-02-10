@@ -32,7 +32,7 @@ SYSTEM_USER_RAWDATAPATHS = ['/project/projectdirs/openmsi/original_data']
 API_ROOT = "https://openmsi.nersc.gov/openmsi/"
 
 """Disable debug mode for openmsi to ensure hackers only get normal error messages instead of detailed debug information"""
-DEBUG = True
+DEBUG = False
 
 """Restrict the domains that are allowed to access the site. This is also needed when DEBUG is False"""
 ALLOWED_HOSTS = [".openmsi.nersc.gov"]

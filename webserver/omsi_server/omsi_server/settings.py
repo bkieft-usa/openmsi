@@ -6,6 +6,8 @@ except ImportError:
 import sys
 # Django settings for omsi_server project.
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 """
 Specify a list of unmanaged datapaths that a client is allowed to request data from.
 This is used, e.g., in omsi_access.views.get_real_filename
@@ -131,7 +133,7 @@ STATIC_URL = '/site_media/openmsi/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/var/www/html' + STATIC_URL
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -148,6 +150,8 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'by^!i3o4$#g6in8v9%m!(jmo=0zl!m1_d#ljq0-qmvv-c*3a-c'

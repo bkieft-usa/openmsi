@@ -1,4 +1,5 @@
 {% extends "omsi_client/templates/base.html" %}
+{% load static from staticfiles %}
 {% block content %}
 <!DOCTYPE html>
 <meta charset="utf-8">
@@ -138,7 +139,7 @@ BASTet is available online at <a href="https://github.com/biorack/BASTet">https:
 
 <p>The data format for storage of MSI data is described in the following publication:</p>
 
-<p><em>Oliver Rübel, Annette Greiner, Shreyas Cholia, Katherine Louie, E. Wes Bethel, Trent R. Northen, and Benjamin P. Bowen, "OpenMSI: A High-Performance Web-Based Platform for Mass Spectrometry Imaging" Analytical Chemistry 2013 85 (21), 10354-10361, DOI: 10.1021/ac402540a. <a href="https://openmsi.nersc.gov/site_media/openmsi/images/publications/openmsi_acs_2013.bib">[BibTeX]</a><a href="http://pubs.acs.org/doi/abs/10.1021/ac402540a">[Online at ACS]</a></em></p>
+<p><em>Oliver Rübel, Annette Greiner, Shreyas Cholia, Katherine Louie, E. Wes Bethel, Trent R. Northen, and Benjamin P. Bowen, "OpenMSI: A High-Performance Web-Based Platform for Mass Spectrometry Imaging" Analytical Chemistry 2013 85 (21), 10354-10361, DOI: 10.1021/ac402540a. <a href="{% static "images/publications/openmsi_acs_2013.bib" %}">[BibTeX]</a><a href="http://pubs.acs.org/doi/abs/10.1021/ac402540a">[Online at ACS]</a></em></p>
 
 <p>The broader storage, analysis, provenance, and workflow capabilities of BASTet are described in an upcoming publication:</p>
 

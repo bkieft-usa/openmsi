@@ -1155,8 +1155,8 @@ function init(resetPoints)
 
 	//$("#graphs").height( omsi_globals.canvas.height + 200); //$("#body").height()
 
-	document.getElementById("graph1").innerHTML = "<h3><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Loading...</h3>";
-	document.getElementById("graph2").innerHTML = "<h3><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Loading...</h3>";
+	document.getElementById("graph1").innerHTML = "<h3><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Loading...</h3>";
+	document.getElementById("graph2").innerHTML = "<h3><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Loading...</h3>";
 	var ctx = omsi_globals.canvas.getContext("2d");
 	ctx.save();
 	ctx.font="bold 20px Arial";

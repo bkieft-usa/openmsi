@@ -372,7 +372,7 @@
     function checkJobStatus(dataindex, rowindex){
         //Update the status button to add a spinner and to disable it while we update the status
         var buttonId = "statusButton"+dataindex
-        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Updating Status...</bf>";
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Updating Status...</bf>";
         document.getElementById(buttonId).disabled = true
 
         // Get the estimated job status
@@ -390,7 +390,7 @@
     function estimateJobStart(dataindex, rowindex){
         //Update the status button to add a spinner and to disable it while we update the status
         var buttonId = "estimateJobStartButton"+dataindex
-        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Updating Status...</bf>";
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Updating Status...</bf>";
         document.getElementById(buttonId).disabled = true
 
         // Update the job status and estimate the start time
@@ -423,7 +423,7 @@
     function getStatusMessage(dataindex, rowindex){
         //Update the status button to add a spinner and to disable it while we update the status
         var buttonId = "statusMessageButton"+dataindex
-        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Checking Status...</bf>";
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Checking Status...</bf>";
         document.getElementById(buttonId).disabled = true
 
         // Update the job status and estimate the start time
@@ -448,7 +448,7 @@
     function submitJob(dataindex, rowindex){
         //Update the submit button to add a spinner and to disable it while we update the status
         var buttonId = "submitButton"+dataindex
-        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Updating Status...</bf>";
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Updating Status...</bf>";
         document.getElementById(buttonId).disabled = true
 
         // Submit the job if possible and update the data table
@@ -466,7 +466,7 @@
     function deleteJob(dataindex, rowindex){
          //Update the submit button to add a spinner and to disable it while we update the status
         var buttonId = "deleteButton"+dataindex
-        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}/images/ajax-loader.gif' /> Deleting Job...</bf>";
+        document.getElementById(buttonId).innerHTML = "<bf><img src='{{ STATIC_URL }}images/ajax-loader.gif' /> Deleting Job...</bf>";
         document.getElementById(buttonId).disabled = true
 
         // Submit the job if possible and update the data table

@@ -42,9 +42,6 @@ from django.forms import ModelForm
 query_paramters = {'file': 'file', 'owner': 'owner'}
 
 
-def fileUploader(request, id=None, template_name='fileUploader.html'):
-    return render_to_response(template_name, context_instance=RequestContext(request))
-
 def hierarchicalFilemanager(request, id=None, template_name='hierarchicalFileManager.html'):
     my_data_dict = {'api_root': settings.API_ROOT}
     return render_to_response(template_name, my_data_dict, context_instance=RequestContext(request))

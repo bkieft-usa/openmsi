@@ -28,7 +28,7 @@ spec:
               privileged: false
               readOnlyRootFilesystem: false
               runAsNonRoot: true
-              runAsUser: 55710
+              runAsUser: {{NON_ROOT_UID}}
             stdin: true
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File

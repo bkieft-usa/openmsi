@@ -18,6 +18,7 @@ OMSI_IMAGE=""
 BACKUP_IMAGE=""
 export API_ROOT="https://openmsi.nersc.gov/"
 DEV=0
+export NON_ROOT_UID="$UID"
 
 # mount points of the persistant volumes
 BACKUP_MNT=/backups
@@ -97,6 +98,7 @@ required_flag_or_error "$TIMESTAMP" "You are required to supply a backup timesta
 
 # relative to the global filesystem:
 DB_BACKUP="${ROOT_BACKUP_DIR}/${TIMESTAMP}/${BACKUP_PREFIX}${TIMESTAMP}.gz"
+echo "Using backup: ${DB_BACKUP}"
 
 # directory containing this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -109,20 +111,31 @@ if [[ ! -x "${MO_EXE}" ]]; then
   chmod +x "${MO_EXE}"
 fi
 
+# Get dependency kubeval
+KUBEVAL_EXE="${SCRIPT_DIR}/lib/kubeval"
+if [[ ! -x "${KUBEVAL_EXE}" ]]; then
+  mkdir -p "$(dirname "$KUBEVAL_EXE")"
+  pushd "$(dirname "$KUBEVAL_EXE")"
+  curl -sL https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz | \
+          tar xvz "$(basename "$KUBEVAL_EXE")"
+  popd
+fi
+
 if [[ $DEV -eq 1 ]]; then
   PROJECT="c-fwj56:p-lswtz" # development:m2650
   export LB_FQDN="lb.openmsi.development.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi-dev.nersc.gov"
   export PREFIX="openmsi-dev_sqlite_"
+  CERT_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.cert"
+  KEY_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.key"
 else
   PROJECT="c-tmq7p:p-gqfz8" # production cluster for m2650. Run 'rancher context switch' to get other values.
   export LB_FQDN="lb.openmsi.production.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi.nersc.gov"
   export PREFIX="openmsi_sqlite_"
+  CERT_FILE="${SCRIPT_DIR}/.tls.openmsi.cert"
+  KEY_FILE="${SCRIPT_DIR}/.tls.openmsi.key"
 fi
-
-CERT_FILE="${SCRIPT_DIR}/.tls.cert"
-KEY_FILE="${SCRIPT_DIR}/.tls.key"
 
 # backup file locations within the backup_restore container:
 DB_BACKUP_INTERNAL="${BACKUP_MNT}/${TIMESTAMP}/$(basename $DB_BACKUP)"
@@ -141,7 +154,10 @@ rm -rf "$DEPLOY_TMP/*"
 # does replacement of **exported** environment variables enclosed in double braces
 # such as {{API_ROOT}}
 for TEMPLATE in $(find "${SCRIPT_DIR}/spin2/" -name '*.yaml.template'); do
-  "${MO_EXE}" -u "${TEMPLATE}" > "${DEPLOY_TMP}/$(basename ${TEMPLATE%.*})"
+  REPLACED_FILE="${DEPLOY_TMP}/$(basename ${TEMPLATE%.*})"
+  "${MO_EXE}" -u "${TEMPLATE}" > "${REPLACED_FILE}"
+  # lint yaml file
+  "${KUBEVAL_EXE}" "${REPLACED_FILE}"
 done
 
 if declare -F module; then
@@ -201,7 +217,7 @@ rancher kubectl exec deployment.apps/restore $FLAGS -- /bin/bash -c "gunzip -c $
 rancher kubectl scale $FLAGS --replicas=0 deployment.app/restore
 
 rancher kubectl wait $FLAGS deployment.apps/restore-root --for=condition=available --timeout=60s
-rancher kubectl exec deployment.apps/restore-root $FLAGS -- chown 55710:55809 "${DB_MNT}/openmsi.sqlite"
+rancher kubectl exec deployment.apps/restore-root $FLAGS -- chown "${NON_ROOT_UID}:55809" "${DB_MNT}/openmsi.sqlite"
 rancher kubectl scale $FLAGS --replicas=0 deployment.app/restore-root
 
 ## Create openmsi pod

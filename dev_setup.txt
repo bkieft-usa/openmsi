@@ -1,0 +1,30 @@
+# get clone and pull in the BASTet sub-module as well
+git clone --recurse-submodules git@bitbucket.org:bpbowen/openmsi_web.git
+
+# active settings for local development (don't check this file into git!):
+echo "from host_profiles.client_dev import *" > webserver/omsi_server/local_settings.py
+
+# install pyenv to make it easy to run multiple python versions:
+curl https://pyenv.run | bash
+
+# Restart your shell so the path changes take effect:
+exec $SHELL
+
+# install python version 2.7.18 (this will take several minutes....):
+pyenv install 2.7.18
+
+# there is a .python-version file within the openmsi_web git repo
+# that will automatically activate python v2.7.18
+
+# install pipenv to manage virtual environments:
+pip install --user pipenv
+
+cd openmsi_web
+
+# install dependencies from Pipfile.lock
+pipenv install --deploy
+
+cd openmsi_web/webserver/omsi_server
+
+# start the web server
+pipenv run python manage.py runserver

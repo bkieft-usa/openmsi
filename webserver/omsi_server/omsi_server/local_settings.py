@@ -1,1 +1,1 @@
-from host_profiles.openmsi_nersc_gov import *
+from host_profiles.client_dev import *

@@ -1,6 +1,8 @@
 # get clone and pull in the BASTet sub-module as well
 git clone --recurse-submodules git@bitbucket.org:bpbowen/openmsi_web.git
 
+cd openmsi_web
+
 # active settings for local development (don't check this file into git!):
 echo "from host_profiles.client_dev import *" > webserver/omsi_server/local_settings.py
 
@@ -19,12 +21,10 @@ pyenv install 2.7.18
 # install pipenv to manage virtual environments:
 pip install --user pipenv
 
-cd openmsi_web
-
 # install dependencies from Pipfile.lock
 pipenv install --deploy
 
-cd openmsi_web/webserver/omsi_server
+cd webserver/omsi_server
 
 # start the web server
 pipenv run python manage.py runserver

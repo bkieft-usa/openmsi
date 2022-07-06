@@ -2,3 +2,4 @@
 .tls.*
 deploy_tmp/
 lib/
+*.log

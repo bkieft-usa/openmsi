@@ -66,7 +66,7 @@ if [[ "$REGISTRY" != "NONE" ]]; then
     PUSH_FLAGS="--format=docker"
   fi
   ${DOCKER} image tag "${SHORT_TAG}" "${LONG_TAG}"
-  ${DOCKER} image push ${PUSH_FLAGS:-} "${LONG_TAG}" "docker://${LONG_TAG}"
+  ${DOCKER} image push ${PUSH_FLAGS:-} "${LONG_TAG}"
   TAG="${LONG_TAG}"
 else
   TAG="${SHORT_TAG}"

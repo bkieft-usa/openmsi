@@ -123,7 +123,7 @@ def get_mz(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("A required query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("A required query parameter could not be read.")
 
     filename, filemodel, filetype = omsi_file_authorization.authorize_fileaccess(
         request=request, infilename=filename)
@@ -162,7 +162,7 @@ def get_mz(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("An optional query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("An optional query parameter could not be read.")
 
     return get_mzaxes(request=request,
                       filename=filename,
@@ -467,7 +467,7 @@ def get_spectrum(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("A required query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("A required query parameter could not be read.")
 
     filename, filemodel, filetype = omsi_file_authorization.authorize_fileaccess(
         request=request, infilename=filename)
@@ -508,7 +508,7 @@ def get_spectrum(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("An optional query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("An optional query parameter could not be read.")
 
     if dataIndex is None and anaIdentifier is None and anaIndex is None:
 
@@ -1034,7 +1034,7 @@ def get_slice(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("A required query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("A required query parameter could not be read.")
 
     filename, filemodel, filetype = omsi_file_authorization.authorize_fileaccess(
         request=request, infilename=filename)
@@ -1073,7 +1073,7 @@ def get_slice(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("An optional query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("An optional query parameter could not be read.")
 
     # Return the JSON object or PNG image for the data slice
     return get_data_slice(request=request,
@@ -1312,7 +1312,7 @@ def get_cube(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("A required query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("A required query parameter could not be read.")
 
     filename, filemodel, filetype = omsi_file_authorization.authorize_fileaccess(
         request=request, infilename=filename)
@@ -1341,7 +1341,7 @@ def get_cube(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("An optional query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("An optional query parameter could not be read.")
 
     if respFormat == views_definitions.available_formats['HDF5']:
         if expIndex is None:
@@ -1633,7 +1633,7 @@ def get_metadata(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("A required query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("A required query parameter could not be read.")
 
     # 1.2 Get optional input parameters
     try:
@@ -1663,7 +1663,7 @@ def get_metadata(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("An optional query parameter could not be read. " + str(sys.exc_info()))
+            return HttpResponseNotFound("An optional query parameter could not be read.")
 
     #############################################################################
     # 2. Retrieve the required metadata                                         #

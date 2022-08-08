@@ -67,7 +67,7 @@ def filemanager(request, template_name='filemanager.html'):
         if settings.DEBUG:
             raise 
         else:
-            return HttpResponseNotFound("A required query parameter could not be read. "+str(sys.exc_info())) 
+            return HttpResponseNotFound("A required query parameter could not be read.")
 
     #Get full path to the file
     realFilename, myfile, filetype = omsi_file_authorization.authorize_fileaccess(
@@ -157,7 +157,7 @@ def addfile(request):
         if settings.DEBUG:
             raise 
         else:
-            return HttpResponseNotFound("A required query parameter could not be read. "+str(sys.exc_info()))
+            return HttpResponseNotFound("A required query parameter could not be read.")
 
     # 2. Check if the file is valid
     if not os.path.isfile(filename):

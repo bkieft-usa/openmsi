@@ -114,7 +114,7 @@ def convert(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseBadRequest("A required query parameter could not be read. "+str(sys.exc_info()))
+            return HttpResponseBadRequest("A required query parameter could not be read.")
 
     # 1.2) Get additional query-string parameters
     # 1.2.1) Analysis parameters
@@ -405,7 +405,7 @@ def update(request):
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseBadRequest("A required query parameter could not be read. "+str(sys.exc_info()))
+            return HttpResponseBadRequest("A required query parameter could not be read.")
 
     # 1.2) Get optional query string parameters status
     status = request.GET.get('status', None)

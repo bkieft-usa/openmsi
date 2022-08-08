@@ -3,3 +3,9 @@
 deploy_tmp/
 lib/
 *.log
+*.csr
+*.key
+*.pem
+*.cert
+*.crt
+*.cer

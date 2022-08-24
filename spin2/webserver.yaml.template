@@ -84,7 +84,7 @@ spec:
           type: Directory
         name: vol2
       - hostPath:
-          path: /global/cfs/projectdirs/openmsi
+          path: /global/cfs/cdirs/openmsi
           type: Directory
         name: vol3
 status: {}

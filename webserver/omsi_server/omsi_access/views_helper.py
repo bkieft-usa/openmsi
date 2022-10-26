@@ -97,7 +97,7 @@ def get_omsi_fileobject(request,
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("File not found:" + str(filename) + " " + str(sys.exc_info()))
+            return HttpResponseNotFound("File not found")
 
     # 2)   Get the requested omsi object from the file
     # 2.1) Return the omsi_file object itself
@@ -107,14 +107,13 @@ def get_omsi_fileobject(request,
     # 2.2) Get the experiment
     exp = omsiFile.get_experiment(int(expIndex))
     if exp is None:
-        return HttpResponseNotFound("Experiment not found " + str(expIndex) + " " + str(sys.exc_info()))
+        return HttpResponseNotFound("Experiment not found ")
 
     # 2.3) Return the instrument information
     if instrumentInfo:
         inst = exp.get_instrument_info()
         if inst is None:
-            return HttpResponseNotFound("Instrument information for experiment not found " +
-                                        str(expIndex) + " " + str(sys.exc_info()))
+            return HttpResponseNotFound("Instrument information for experiment not found ")
         else:
             return inst
 
@@ -122,8 +121,7 @@ def get_omsi_fileobject(request,
     if methodsInfo:
         methodsinfo = exp.get_method_info()
         if methodsinfo is None:
-            return HttpResponseNotFound("Sample information for experiment not found " +
-                                        str(expIndex) + " " + str(sys.exc_info()))
+            return HttpResponseNotFound("Sample information for experiment not found ")
         else:
             return methodsinfo
 
@@ -138,7 +136,7 @@ def get_omsi_fileobject(request,
         if data is not None:
             return data
         else:
-            return HttpResponseNotFound("Dataset not found " + str(dataIndex) + " " + str(sys.exc_info()))
+            return HttpResponseNotFound("Dataset not found ")
 
     # 2.7) Get the analysis object
     ana = None
@@ -148,7 +146,7 @@ def get_omsi_fileobject(request,
         ana = exp.get_analysis_by_identifier(anaIdentifier)
 
     if ana is None:
-        return HttpResponseNotFound("Analysis not found " + str(anaIndex) + " " + str(sys.exc_info()))
+        return HttpResponseNotFound("Analysis not found ")
 
     # 2.8) Return the analysis object
     if anaDataName is None:
@@ -157,8 +155,7 @@ def get_omsi_fileobject(request,
     else:
         data = ana[anaDataName]
         if data is None:
-            return HttpResponseNotFound("Analysis dataset " + str(anaDataName) +
-                                        "  not found" + " " + str(sys.exc_info()))
+            return HttpResponseNotFound("Analysis dataset ")
 
     return data
 
@@ -265,7 +262,7 @@ def get_omsi_rawdata_numpy(request,
             if settings.DEBUG:
                 raise
             else:
-                return HttpResponseNotFound("access to the data failed " + str(sys.exc_info()))
+                return HttpResponseNotFound("access to the data failed ")
 
     # Load the data for a selection with multiple lists specified in the
     # selection
@@ -410,7 +407,7 @@ def get_omsi_rawdata_numpy(request,
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("Data operations failed: " + str(operations) + str(sys.exc_info()))
+            return HttpResponseNotFound("Data operations failed: ")
 
     if isinstance(data, HttpResponse):
         return data
@@ -537,7 +534,7 @@ def numpy_data_to_httpresponse(request, data, respFormat, returnFilename=None):
             if settings.DEBUG:
                 raise
             else:
-                return HttpResponseNotFound("Generation of image from the data failed " + str(sys.exc_info()))
+                return HttpResponseNotFound("Generation of image from the data failed ")
     else:
         # Usually there are several checks for this problem before we reach
         # this place but just in case.
@@ -1686,7 +1683,7 @@ def send_email(subject, recipients, body, sender='openmsi.automail@openmsi.nersc
         smtp.sendmail(sender, recipients, msg.as_string())
         smtp.quit()
     except:
-        warnings.warn('Email could not be sent' + str(sys.exc_info()))
+        warnings.warn('Email could not be sent')
 
 
 def __generate_cache_key__(data_type, primary_key):

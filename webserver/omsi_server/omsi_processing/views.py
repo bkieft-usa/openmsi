@@ -290,7 +290,7 @@ def convert(request):
                 if file_memory_size is None or file_memory_size < format_size:
                     file_memory_size = format_size
     except:
-        warnings.warn('Could not determine size of file for conversion' + str(sys.exc_info()))
+        warnings.warn('Could not determine size of file for conversion')
 
     # 5) Define the queue, walltime, memory etc. settings for the given machine (hopper,cori,edison,carver)
     task_execution_settings = backend_class.set_queue_and_time(task_execution_settings=task_execution_settings,
@@ -719,7 +719,7 @@ def add_omsi_file(request, filepath, username):
                     warning_str += unicode(wm) + u'   |   '
             logger.debug('Add to DB email sent:' + warning_str)
     except:
-        logger.debug('Add to DB email not send due to error. ' + str(sys.exc_info()))
+        logger.debug('Add to DB email not send due to error. ')
 
     # try:
     #     from omsi.shared.omsi_web_helper import WebHelper

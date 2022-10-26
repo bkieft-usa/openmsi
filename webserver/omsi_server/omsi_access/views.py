@@ -734,7 +734,7 @@ def get_data_spectrum(request,
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("Data load failed: " + str(sys.exc_info()))
+            return HttpResponseNotFound("Data load failed: ")
 
     # Load the data
     try:
@@ -798,7 +798,7 @@ def get_data_spectrum(request,
         if settings.DEBUG:
             raise
         else:
-            return HttpResponseNotFound("Data load failed: " + str(sys.exc_info()))
+            return HttpResponseNotFound("Data load failed: ")
 
     #Apply the final transformation to the data
     if data.ndim > 1 and respFormat == views_definitions.available_formats['PNG']:
@@ -1770,4 +1770,3 @@ def get_metadata(request):
         return HttpResponseNotFound("Invalid response format requested. " +
                                     str(respFormat) + "Valid formats are: " +
                                     views_definitions.available_formats.values())
-

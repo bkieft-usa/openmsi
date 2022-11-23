@@ -333,8 +333,7 @@ def get_mzaxes(request,
 
     # Return the requested data
     if respFormat == views_definitions.available_formats['JSON']:
-        return HttpResponse("error"
-            content=content,
+        return HttpResponse(content=content,
             content_type='application/json')
     elif respFormat == views_definitions.available_formats['HDF5']:
         returnFilename = views_helper.generate_hdf5_filename(
@@ -942,9 +941,7 @@ def get_data_spectrum(request,
 
     # Unknown response format
     else:
-        return HttpResponseNotFound(
-            "Unknown format requested. The query parameter 'format' " +
-            "did not match either: JSON, PNG, or HDF5. (" + str(respFormat) + ")")
+        return HttpResponseNotFound("Unknown format requested. The query parameter 'format' ")
 
 
 #//////////////////////////////////////////////////////////////////

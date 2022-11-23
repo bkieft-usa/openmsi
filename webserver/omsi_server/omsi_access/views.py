@@ -137,9 +137,7 @@ def get_mz(request):
             views_definitions.available_formats['JSON'])
         if respFormat not in views_definitions.available_formats.values():
             return HttpResponseNotFound(
-                "Invalid response format requested. " +
-                str(respFormat) + "Valid formats are: " +
-                views_definitions.available_formats.values())
+                "Invalid response format requested. ")
         dataIndex = request.GET.get(
             views_definitions.query_parameters['dataIndex'],
             None)
@@ -335,7 +333,7 @@ def get_mzaxes(request,
 
     # Return the requested data
     if respFormat == views_definitions.available_formats['JSON']:
-        return HttpResponse(
+        return HttpResponse("error"
             content=content,
             content_type='application/json')
     elif respFormat == views_definitions.available_formats['HDF5']:
@@ -352,10 +350,7 @@ def get_mzaxes(request,
     elif respFormat == views_definitions.available_formats['PNG']:
         return HttpResponseNotFound("PNG is currently not supported by qmz.")
     else:
-        return HttpResponseNotFound("Invalid response format requested. " +
-                                    str(respFormat) +
-                                    "Valid formats are: " +
-                                    views_definitions.available_formats.values())
+        return HttpResponseNotFound("Invalid response format requested. ")
 
 
 #//////////////////////////////////////////////////////////////////
@@ -480,10 +475,7 @@ def get_spectrum(request):
             views_definitions.query_parameters['format'],
             views_definitions.available_formats['JSON'])
         if respFormat not in views_definitions.available_formats.values():
-            return HttpResponseNotFound(
-                "Invalid response format requested. " +
-                str(respFormat) + "Valid formats are: " +
-                views_definitions.available_formats.values())
+            return HttpResponseNotFound("Invalid response format requested. " )
         x2 = get_method.get(views_definitions.query_parameters['row2'], None)
         y2 = get_method.get(views_definitions.query_parameters['col2'], None)
         operations = get_method.get(views_definitions.query_parameters['operations'], None)
@@ -676,13 +668,13 @@ def get_data_spectrum(request,
     # is not needed but it is a safeguard against possible errors in future
     # changes
     if selectionTypeX < 0 or selectionTypeX == omsi_data_selection.selection_type['invalid']:
-        return HttpResponseNotFound("Invalid selection string x=" + x)
+        return HttpResponseNotFound("Invalid selection string x=")
     if selectionTypeY < 0 or selectionTypeY == omsi_data_selection.selection_type['invalid']:
-        return HttpResponseNotFound("Invalid selection string y=" + y)
+        return HttpResponseNotFound("Invalid selection string y=")
     if (selectionTypeX2 < 0 or selectionTypeX2 == omsi_data_selection.selection_type['invalid']) and x2 is not None:
-        return HttpResponseNotFound("Invalid selection string x2=" + x2)
+        return HttpResponseNotFound("Invalid selection string x2=")
     if (selectionTypeY2 < 0 or selectionTypeY2 == omsi_data_selection.selection_type['invalid']) and y2 is not None:
-        return HttpResponseNotFound("Invalid selection string y2=" + y2)
+        return HttpResponseNotFound("Invalid selection string y2=")
 
     customMZ = None
     try:

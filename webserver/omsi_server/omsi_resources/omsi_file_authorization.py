@@ -477,7 +477,7 @@ def authorize_fileaccess(request,
          #Remove the "" characters from the filename string if necessary
         realfilename = str(infilename).rstrip("'").rstrip('"').lstrip("'").lstrip('""')
     except:
-        return HttpResponseNotFound("Invalid filename. "+str(sys.exc_info())), None, g_file_types['omsi']
+        return HttpResponseNotFound("Invalid filename. "), None, g_file_types['omsi']
 
     # 1) Authorize access to openmsi files
     if check_omsi_files:

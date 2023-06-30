@@ -13,6 +13,10 @@ VERSION=`date "+%Y-%m-%d-%H-%M"`
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 IMAGE_NAME="$(dirname "${SCRIPT_DIR}")"
 
+if which podman-hpc &> /dev/null; then
+  DOCKER='podman-hpc'
+fi
+
 if [[ IMAGE_NAME != "backup" ]]; then
   IMAGE_NAME="webserver"
 fi
@@ -62,10 +66,12 @@ fi
 ${DOCKER} image build --tag "${SHORT_TAG}" "${DOCKERFILE_DIR}"
 
 if [[ "$REGISTRY" != "NONE" ]]; then
-  if [[ $(basename $(readlink -f $(which ${DOCKER}))) == 'podman' ]]; then
+  DOCKER_RESOLVED="$(basename $(readlink -f $(which ${DOCKER})))"
+  if [[ $DOCKER_RESOLVED == 'podman' ]] || [[ $DOCKER_RESOLVED == 'podman-hpc' ]]; then
     PUSH_FLAGS="--format=docker"
   fi
   ${DOCKER} image tag "${SHORT_TAG}" "${LONG_TAG}"
+  "${DOCKER}" login "${REGISTRY}"
   ${DOCKER} image push ${PUSH_FLAGS:-} "${LONG_TAG}"
   TAG="${LONG_TAG}"
 else

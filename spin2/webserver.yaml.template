@@ -73,7 +73,7 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:
-        fsGroup: 55809
+        fsGroup: {{NON_ROOT_GID}}
       terminationGracePeriodSeconds: 30
       volumes:
       - name: vol1

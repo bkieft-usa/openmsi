@@ -17,7 +17,8 @@ OMSI_IMAGE=""
 BACKUP_IMAGE=""
 export API_ROOT="https://openmsi.nersc.gov/"
 DEV=0
-export NON_ROOT_UID="$UID"
+export NON_ROOT_UID='97932'  # msdata user on NERSC
+export NON_ROOT_GID='60734'  # metatlas group on NERSC
 
 # mount points of the persistant volumes
 BACKUP_MNT=/backups
@@ -224,7 +225,7 @@ rancher kubectl exec deployment.apps/restore $FLAGS -- /bin/bash -c "gunzip -c $
 rancher kubectl scale $FLAGS --replicas=0 deployment.app/restore
 
 rancher kubectl wait $FLAGS deployment.apps/restore-root --for=condition=available --timeout=60s
-rancher kubectl exec deployment.apps/restore-root $FLAGS -- chown "${NON_ROOT_UID}:55809" "${DB_MNT}/openmsi.sqlite"
+rancher kubectl exec deployment.apps/restore-root $FLAGS -- chown "${NON_ROOT_UID}:${NON_ROOT_GID}" "${DB_MNT}/openmsi.sqlite"
 rancher kubectl scale $FLAGS --replicas=0 deployment.app/restore-root
 
 ## Create openmsi pod

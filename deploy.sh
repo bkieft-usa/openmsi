@@ -2,8 +2,7 @@
 
 set -euf -o pipefail
 
-NAMESPACE="${NAMESPACE:-openmsi}"
-
+NAMESPACE='openmsi'
 SPIN_MODULE="spin/2.0"
 RANCHER_MAJOR_VERSION_REQUIRED=2
 
@@ -49,6 +48,13 @@ while [[ "$#" -gt 0 ]]; do
   shift
 done
 
+function k8s_version() {
+  rancher kubectl version --short=true \
+  | grep '^Server Version:' \
+  | tr -d ' v'  \
+  | cut -d: -f2
+}
+
 function required_flag_or_error() {
   if [[ -z  "$1" ]]; then
     >&2 echo "ERROR: ${2}"
@@ -73,8 +79,8 @@ function file_exists_readable_not_empty_or_error () {
 }
 
 function file_safe_secret_or_error() {
-  if [ $(stat -c %a "$1") != 600 ]; then
-    >&2 echo "ERROR: ${1} must have file permissions 600."
+  if [ $(stat -c %a "$1") != 600 ] && [ $(stat -c %a "$1") != 660 ]; then
+    >&2 echo "ERROR: ${1} must have file permissions 600 or 660."
     exit 3 
   fi
   return 0
@@ -111,13 +117,13 @@ if [[ ! -x "${MO_EXE}" ]]; then
   chmod +x "${MO_EXE}"
 fi
 
-# Get dependency kubeval
-KUBEVAL_EXE="${SCRIPT_DIR}/lib/kubeval"
+# Get dependency kubeconform
+KUBEVAL_EXE="${SCRIPT_DIR}/lib/kubeconform"
 if [[ ! -x "${KUBEVAL_EXE}" ]]; then
   mkdir -p "$(dirname "$KUBEVAL_EXE")"
   pushd "$(dirname "$KUBEVAL_EXE")"
-  curl -sL https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz | \
-          tar xvz "$(basename "$KUBEVAL_EXE")"
+  curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz \
+  | tar xvz "$(basename "$KUBEVAL_EXE")"
   popd
 fi
 
@@ -151,15 +157,6 @@ DEPLOY_TMP="${SCRIPT_DIR}/deploy_tmp"
 mkdir -p "$DEPLOY_TMP"
 rm -rf "$DEPLOY_TMP/*"
 
-# does replacement of **exported** environment variables enclosed in double braces
-# such as {{API_ROOT}}
-for TEMPLATE in $(find "${SCRIPT_DIR}/spin2/" -name '*.yaml.template'); do
-  REPLACED_FILE="${DEPLOY_TMP}/$(basename ${TEMPLATE%.*})"
-  "${MO_EXE}" -u "${TEMPLATE}" > "${REPLACED_FILE}"
-  # lint yaml file
-  "${KUBEVAL_EXE}" "${REPLACED_FILE}"
-done
-
 if declare -F module; then
   module unload spin/1.0 || true
   module load "${SPIN_MODULE}"
@@ -189,8 +186,18 @@ if ! rancher inspect --type namespace "${NAMESPACE}"; then
   rancher namespace create "${NAMESPACE}"
 fi
 
+for TEMPLATE in $(find "${SCRIPT_DIR}/spin2/" -name '*.yaml.template'); do
+  REPLACED_FILE="${DEPLOY_TMP}/$(basename ${TEMPLATE%.*})"
+  # does replacement of **exported** environment variables enclosed in double braces
+  # such as {{API_ROOT}}
+  "${MO_EXE}" -u "${TEMPLATE}" > "${REPLACED_FILE}"
+  # lint kubernetes configruation file
+  "${KUBEVAL_EXE}" -kubernetes-version "$(k8s_version)" "${REPLACED_FILE}"
+done
+
 # clean up any existing resources to make this script re-runable 
-rancher kubectl delete deployments,statefulsets,cronjobs,services,secrets,pods,ingresses --all $FLAGS
+rancher kubectl delete deployments,statefulsets,cronjobs,services,pods,ingresses --all $FLAGS
+rancher kubectl delete secret openmsi-cert $FLAGS
 
 # start building up the new instance
 rancher kubectl create secret tls openmsi-cert $FLAGS \

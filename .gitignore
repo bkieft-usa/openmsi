@@ -9,3 +9,4 @@ lib/
 *.cert
 *.crt
 *.cer
+*.pyc

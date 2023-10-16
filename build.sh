@@ -4,8 +4,8 @@
 set -euf -o pipefail
 
 SPIN_USER="$USER"
-PROJECT="openmsi"
-REGISTRY="registry.spin.nersc.gov"
+PROJECT="m2650/openmsi"
+REGISTRY="registry.nersc.gov"
 DOCKER="docker"
 VERSION=`date "+%Y-%m-%d-%H-%M"`
 

@@ -159,7 +159,7 @@ mkdir -p "$DEPLOY_TMP"
 rm -rf "$DEPLOY_TMP/*"
 
 if declare -F module; then
-  module unload spin/1.0 || true
+  module unload spin/1.0 &> /dev/null || true
   module load "${SPIN_MODULE}"
 fi
 

@@ -58,6 +58,10 @@ spec:
       schedulerName: default-scheduler
       securityContext:
         fsGroup: {{NON_ROOT_GID}}
+        supplementalGroups:
+         - 55809
+         - 60734
+         - 72473
       terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:

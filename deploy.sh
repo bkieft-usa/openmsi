@@ -15,7 +15,6 @@ ROOT_BACKUP_DIR="/global/cfs/cdirs/openmsi/omsi_db/backups/"
 # initialize variables to avoid errors
 OMSI_IMAGE=""
 BACKUP_IMAGE=""
-export API_ROOT="https://openmsi.nersc.gov/"
 DEV=0
 export NON_ROOT_UID='97932'  # msdata user on NERSC
 export NON_ROOT_GID='60734'  # metatlas group on NERSC
@@ -28,7 +27,6 @@ TIMESTAMP=
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
-    -a|--api) export API_ROOT="$2"; shift ;;
     -b|--backup) export BACKUP_IMAGE="$2"; shift ;;
     -d|--dev) DEV=1 ;;
     -w|--webserver) export OMSI_IMAGE="$2"; shift ;;
@@ -37,7 +35,6 @@ while [[ "$#" -gt 0 ]]; do
         echo -e "$0 [options]"
         echo ""
         echo "   -h, --help          show this command refernce"
-	echo "   -a, --api           API root url (default: https://openmsi.nersc.gov/)"
 	echo "   -b, --backup        source of backup docker image (required)"
 	echo "   -d, --dev           deploy development instance instead of production"
 	echo "   -w, --webserver     source of openmsi webserver docker image (required)"
@@ -98,7 +95,6 @@ if [[ $TIMESTAMP == '' ]]; then
 	                           sort -r | head -1)))
 fi
 
-required_flag_or_error "$API_ROOT " "You are required to supply the API_ROOT url via -a or --api."
 required_flag_or_error "$OMSI_IMAGE" "You are required to supply a source for the openmsi docker image via -w or --webserver."
 required_flag_or_error "$BACKUP_IMAGE" "You are required to supply a source for the backup docker image via -b or --backup."
 required_flag_or_error "$TIMESTAMP" "You are required to supply a backup timestamp via -t or --timestamp."
@@ -133,6 +129,7 @@ if [[ $DEV -eq 1 ]]; then
   export LB_FQDN="lb.openmsi.development.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi-dev.nersc.gov"
   export PREFIX="openmsi-dev_sqlite_"
+  export API_ROOT="https://openmsi-dev.nersc.gov/"
   CERT_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.nersc.gov.cert"
   KEY_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.nersc.gov.key"
 else
@@ -140,6 +137,7 @@ else
   export LB_FQDN="lb.openmsi.production.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi.nersc.gov"
   export PREFIX="openmsi_sqlite_"
+  export API_ROOT="https://openmsi.nersc.gov/"
   CERT_FILE="${SCRIPT_DIR}/.tls.openmsi.nersc.gov.cert"
   KEY_FILE="${SCRIPT_DIR}/.tls.openmsi.nersc.gov.key"
 fi

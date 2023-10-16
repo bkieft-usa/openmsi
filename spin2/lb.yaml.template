@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
@@ -10,14 +10,20 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: webserver
-          servicePort: web-webserver
+          service: 
+            name: webserver
+            port:
+              name: web-webserver
+        pathType: ImplementationSpecific
   - host: {{OPENMSI_FQDN}}
     http:
       paths:
       - backend:
-          serviceName: webserver
-          servicePort: web-webserver
+          service: 
+            name: webserver
+            port:
+              name: web-webserver
+        pathType: ImplementationSpecific
   tls:
   - hosts:
     - {{OPENMSI_FQDN}}

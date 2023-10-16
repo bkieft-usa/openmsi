@@ -133,15 +133,15 @@ if [[ $DEV -eq 1 ]]; then
   export LB_FQDN="lb.openmsi.development.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi-dev.nersc.gov"
   export PREFIX="openmsi-dev_sqlite_"
-  CERT_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.cert"
-  KEY_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.key"
+  CERT_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.nersc.gov.cert"
+  KEY_FILE="${SCRIPT_DIR}/.tls.openmsi-dev.nersc.gov.key"
 else
   PROJECT="c-tmq7p:p-gqfz8" # production cluster for m2650. Run 'rancher context switch' to get other values.
   export LB_FQDN="lb.openmsi.production.svc.spin.nersc.org"
   export OPENMSI_FQDN="openmsi.nersc.gov"
   export PREFIX="openmsi_sqlite_"
-  CERT_FILE="${SCRIPT_DIR}/.tls.openmsi.cert"
-  KEY_FILE="${SCRIPT_DIR}/.tls.openmsi.key"
+  CERT_FILE="${SCRIPT_DIR}/.tls.openmsi.nersc.gov.cert"
+  KEY_FILE="${SCRIPT_DIR}/.tls.openmsi.nersc.gov.key"
 fi
 
 # backup file locations within the backup_restore container:

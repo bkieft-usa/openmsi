@@ -70,6 +70,8 @@ spec:
           name: vol3
           readOnly: true
       dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: registry-nersc
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:

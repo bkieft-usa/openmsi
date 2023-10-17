@@ -213,9 +213,11 @@ def addfile(request):
 
     # 7. Add the file to the database
     newModel = FileModelOmsi(path=filename)
-    newModel.is_public = True
+    newModel.save()
     #Associate the owner with the file
     newModel.owner_users.add(user)
+
+    newModel.is_public = True
     newModel.save()
 
     # 8. Update the metadata cache for the file

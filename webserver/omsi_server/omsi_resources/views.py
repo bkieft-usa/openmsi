@@ -161,7 +161,7 @@ def addfile(request):
 
     # 2. Check if the file is valid
     if not os.path.isfile(filename):
-        return HttpResponseNotFound("Invalid file path given")
+        return HttpResponseNotFound("Invalid file path given\n%s"%filename)
     else:
         try:
             f = omsi_file(filename, 'r')

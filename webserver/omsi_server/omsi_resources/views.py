@@ -173,47 +173,50 @@ def addfile(request):
     if len(f) > 0:
         return HttpResponseNotFound("The given file is already in the database")
 
-    # 4. Determine who should be added as owner of the file
-    try:
-        owner = request.GET[query_paramters['owner']]
-    except:
-        #Check if we have a username
-        username = request.user.username
-        authenticated = request.user.is_authenticated()
-        if not authenticated:
-            return HttpResponseRedirect(settings.LOGIN_URL+"?next="+request.get_full_path())
-        else:
-            owner = username 
+    ##### COMMENTED 20231017 DUE TO NEWT BEING DOWN #####
+    # # 4. Determine who should be added as owner of the file
+    # try:
+    #     owner = request.GET[query_paramters['owner']]
+    # except:
+    #     #Check if we have a username
+    #     username = request.user.username
+    #     authenticated = request.user.is_authenticated()
+    #     if not authenticated:
+    #         return HttpResponseRedirect(settings.LOGIN_URL+"?next="+request.get_full_path())
+    #     else:
+    #         owner = username 
+    # # 5. Check if the given owner is allowed to access the file
+    # authorized = omsi_file_authorization.__authorize_fileaccess_nonregistered_file__(
+    #     request=request,
+    #     infilename=filename,
+    #     accesstype=omsi_file_authorization.g_access_types["manage"],
+    #     alternate_username=owner)
+    # if request.user.is_superuser and request.user.is_authenticated():
+    #     authorized = True 
+    # if not authorized:
+    #     HttpResponseForbidden("Operation not permitted")        
+    # # 6. Check if the user is in the database
+    # try:
+    #     user = User.objects.get(username=owner)
+    # except:
+    #     try:
+    #         if request.user.is_authenticated():
+    #             user = request.user
+    #         else:
+    #             return HttpResponseForbidden("User not registered in the database")
+    #     except:
+    #         return HttpResponseForbidden("User not registered in the database")
+    #     return HttpResponseForbidden("User not registered in the database")
+    owner = 'bpb'
+    authorized=True
 
-    # 5. Check if the given owner is allowed to access the file
-    authorized = omsi_file_authorization.__authorize_fileaccess_nonregistered_file__(
-        request=request,
-        infilename=filename,
-        accesstype=omsi_file_authorization.g_access_types["manage"],
-        alternate_username=owner)
-    if request.user.is_superuser and request.user.is_authenticated():
-        authorized = True 
-    if not authorized:
-        HttpResponseForbidden("Operation not permitted")
-        
-    # 6. Check if the user is in the database
-    try:
-        user = User.objects.get(username=owner)
-    except:
-        try:
-            if request.user.is_authenticated():
-                user = request.user
-            else:
-                return HttpResponseForbidden("User not registered in the database")
-        except:
-            return HttpResponseForbidden("User not registered in the database")
-        return HttpResponseForbidden("User not registered in the database")
 
     # 7. Add the file to the database
     newModel = FileModelOmsi(path=filename)
-    newModel.save()
+    newModel.is_public = True
     #Associate the owner with the file
     newModel.owner_users.add(user)
+    newModel.save()
 
     # 8. Update the metadata cache for the file
     try:

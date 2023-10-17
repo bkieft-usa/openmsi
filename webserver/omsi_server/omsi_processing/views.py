@@ -677,16 +677,17 @@ def add_omsi_file(request, filepath, username):
     if len(f) > 0:
         logger.debug("File already in the database: "+filepath)
 
-    # 6. Check if the user is in the database
-    try:
-        user = User.objects.get(username=username)
-    except:
-        logger.debug("User not registered in the database")
-        raise ValueError("User not registered in the database. "+username)
-
+    # # 6. Check if the user is in the database
+    # try:
+    #     user = User.objects.get(username=username)
+    # except:
+    #     logger.debug("User not registered in the database")
+    #     raise ValueError("User not registered in the database. "+username)
+    user = 'bpb'
     # 7. Add the file to the database
     if len(f) == 0:
         new_model = FileModelOmsi(path=filepath)
+        new_model.is_public = True
         new_model.save()
         # Associate the owner with the file
         new_model.owner_users.add(user)

@@ -195,19 +195,19 @@ def addfile(request):
     #     authorized = True 
     # if not authorized:
     #     HttpResponseForbidden("Operation not permitted")        
-    # # 6. Check if the user is in the database
-    # try:
-    #     user = User.objects.get(username=owner)
-    # except:
-    #     try:
-    #         if request.user.is_authenticated():
-    #             user = request.user
-    #         else:
-    #             return HttpResponseForbidden("User not registered in the database")
-    #     except:
-    #         return HttpResponseForbidden("User not registered in the database")
-    #     return HttpResponseForbidden("User not registered in the database")
+    # 6. Check if the user is in the database
     owner = 'bpb'
+    try:
+        user = User.objects.get(username=owner)
+    except:
+        try:
+            if request.user.is_authenticated():
+                user = request.user
+            else:
+                return HttpResponseForbidden("User not registered in the database")
+        except:
+            return HttpResponseForbidden("User not registered in the database")
+        return HttpResponseForbidden("User not registered in the database")
     authorized=True
 
 

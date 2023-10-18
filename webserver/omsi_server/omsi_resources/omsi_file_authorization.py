@@ -78,11 +78,11 @@ Define the basic type of file (raw or omsi file)
 #####################################################################
 def get_filedict_omsi(request,
                      accesstype=g_access_types['view']):
-    """Get a list of all managed and unmanged files that the user has access to. 
+    """Get a list of all managed and unmanged files that the user has access to.
        If a file is managed and appears in an unmanaged location, then the corresponding
        managed file entry takes precedence over the unmanaged entry. This is consistent
        with the overall authorization scheme of the system.
-       
+
        :returns: filedict : Dictionary of files with the following information for each file:
 
                 * key : Path of the file
@@ -91,7 +91,7 @@ def get_filedict_omsi(request,
                     * permissions : One of view, edit, manage
                     * status : One of manage or unmanaged
     """
-    #Get list of managed and unmanaged files 
+    #Get list of managed and unmanaged files
     unmanaged_files = get_filedict_omsi_unmanaged(request=request, accesstype=accesstype)
     managed_files = get_fileldict_omsi_managed(request=request, accesstype=accesstype)
     #Merge the list of managed and unmanged files. The update merges the two dicts and overwrites any
@@ -108,19 +108,19 @@ def get_filedict_omsi(request,
 def get_fileldict_omsi_managed(request,
                           accesstype=g_access_types['view']):
     """Get a list of all managed files that the user has access to.
-    
+
        :param request: The http request object used to determine the users name.
        :param accesstype: Define what type of operation the user needs to perform on the data.
                           See g_access_types.
-       
+
        :returns: fileDict : Dictionary of files with the following information for each file:
-            
+
                 * key : Path of the file
-                * value : For each file a dictionary with the following structure 
-                    
-                    * permissions : One of view, edit, manage 
-                    * status : One of manage or unmanaged 
-        
+                * value : For each file a dictionary with the following structure
+
+                    * permissions : One of view, edit, manage
+                    * status : One of manage or unmanaged
+
     """
     #NOTE the code below has the following logic:
     #   - We first generate the list of files a user can view
@@ -128,20 +128,20 @@ def get_fileldict_omsi_managed(request,
     #   - We then check whether the user can manage
     # In each of the step the values for different keys in the dictionaty may be overwritten.
     # In this way we get a list of unique files (no file appears twice) and we have the
-    # highest permission the user has listed in the dictionary. 
+    # highest permission the user has listed in the dictionary.
     global g_filedict_keys
     global g_file_status
     global g_access_types
     global g_request_types
 
-    #Get the name, authentification status, and list of groups of the user 
+    #Get the name, authentification status, and list of groups of the user
     username = request.user.username
     authenticated = request.user.is_authenticated()
     try:
         usergroups = request.user.groups.values_list('name', flat=True)
     except:
         usergroups = []
-    
+
     #Get the list of public files
     f = FileModelOmsi.objects.filter(is_public__exact=True)
     filedict = {}
@@ -151,8 +151,8 @@ def get_fileldict_omsi_managed(request,
                          g_filedict_keys['status']: g_file_status['managed']}  # Values in dictionary
                     for p in f  # for all public files
                    }
-    if authenticated: 
-        #Query the database to see which files the user is allowed to view, edit manage files 
+    if authenticated:
+        #Query the database to see which files the user is allowed to view, edit manage files
         f_user_view = FileModelOmsi.objects.filter(view_users__username__contains=username)
         f_user_edit = FileModelOmsi.objects.filter(edit_users__username__contains=username)
         f_user_manage = FileModelOmsi.objects.filter(owner_users__username__contains=username)
@@ -189,7 +189,7 @@ def get_fileldict_omsi_managed(request,
             for cf in f_user_view:
                 filedict[cf.path] = {g_filedict_keys['permissions']: g_access_types['view'], g_filedict_keys['status']: g_file_status['managed']}
 
-        #Check all files that a user can edit. Files that can be edited by a user can also automatically be viewed by that user 
+        #Check all files that a user can edit. Files that can be edited by a user can also automatically be viewed by that user
         if (accesstype == g_access_types['view']) or (accesstype == g_access_types['edit']):
             for cf in f_groups_edit:
                 filedict[cf.path] = {g_filedict_keys['permissions']: g_access_types['edit'], g_filedict_keys['status']: g_file_status['managed']}
@@ -210,19 +210,19 @@ def get_fileldict_omsi_managed(request,
 def get_filedict_omsi_unmanaged(request,
                                 accesstype=g_access_types['view']):
     """Get a list of all unmanaged files that the user has access to.
-    
+
        :param request: The http request object used to determine the users name.
        :param accesstype: Define what type of operation the user needs to perform on the data.
                           See g_access_types.
-       
+
        :returns: fileDict : Dictionary of files with the following information for each file:
-            
+
                 * key : Path of the file
-                * value : For each file a dictionary with the following structure 
-                    
-                    * permissions : One of view, edit, manage 
-                    * status : One of manage or unmanaged 
-                    
+                * value : For each file a dictionary with the following structure
+
+                    * permissions : One of view, edit, manage
+                    * status : One of manage or unmanaged
+
     """
     global g_file_status
     global g_access_types
@@ -232,7 +232,7 @@ def get_filedict_omsi_unmanaged(request,
     username = request.user.username
     authenticated = request.user.is_authenticated()
     filedict = {}
-    
+
     #Check if we know any possible data paths
     if len(settings.ALLOWED_DATAPATHS) == 0 and len(settings.PRIVATE_DATAPATHS) == 0:
         #return HttpResponseNotFound("No folders with allowed files specified. Contact your system admin to define the ALLOWED_DATAPATHS")
@@ -258,7 +258,7 @@ def get_filedict_omsi_unmanaged(request,
     #Generate list of private unmanged data files
     if authenticated:
         currentlist = []
-        #Iteate through all private data locations for the user 
+        #Iteate through all private data locations for the user
         for p in settings.PRIVATE_DATAPATHS:
             currentpath = os.path.join(p, username)
             if os.path.exists(currentpath):
@@ -338,9 +338,9 @@ def authorize_fileaccess(request,
                          accesstype=g_access_types['view'],
                          check_omsi_files=True,
                          check_raw_files=False):
-    """The function computes the real file name and checks whether the user is authorized to access 
+    """The function computes the real file name and checks whether the user is authorized to access
        the given file.
-    
+
        :param request: The http request object used to determine the users name.
        :param infilename: Filename as given by DJANGO based on provided URL.
        :param accesstype: Define what type of operation the user needs to perform on the data. See g_access_types.
@@ -348,7 +348,7 @@ def authorize_fileaccess(request,
        :type check_omsi_files: bool
        :param check_raw_files: Authorize access to raw data files.
        :type check_raw_files: bool
-       
+
        :returns: The function returns the following two items:
                 * The functions returns a string indicating the full name of the file.
                   If the file does not exists or the user is not allowed to access the
@@ -360,8 +360,8 @@ def authorize_fileaccess(request,
 
        :raises: ValueError is raised in case that both check_omsi_files and check_raw_files is
                 set to False.
-       
-       
+
+
        Authorization Diagram for Omsi Files::
 
              +----------------------+     +---------------------------------------------------------+
@@ -426,8 +426,8 @@ def authorize_fileaccess(request,
                                           |              __authorize_directory_access allows access |
                                           | - If none of the above has worked, indicate that the    |
                                           |   requested file  was not found in an allowed location  |
-                                          +---------------------+-----------------------------------+   
-                            Uses                                |                                        
+                                          +---------------------+-----------------------------------+
+                            Uses                                |
                       +-----------------------------------------+
                       |
                       |                   +---------------------------------------------------------+
@@ -468,7 +468,7 @@ def authorize_fileaccess(request,
                                           |                 have granted access to the requested    |
                                           |                 directory                               |
                                           +---------------------------------------------------------+
-                                                                  
+
     """
     global g_access_types
     global g_file_types
@@ -512,11 +512,11 @@ def authorize_fileaccess(request,
 
 
 def is_file_registered(infilename):
-    """Simple function used to check whether the given file is part of the 
+    """Simple function used to check whether the given file is part of the
        file database.
-       
+
        :param infilename: The full path or name of the file.
-       
+
        :returns: Boolean indicting whether a matching file entry was found.
     """
     f = FileModelOmsi.objects.filter(path__endswith=infilename)
@@ -593,43 +593,43 @@ def __authorize_fileaccess_rawfile__(request,
     # 5) The file is not in the database and was not found in a user's private data location
     return HttpResponseNotFound("Requested file not found."), None
 
-        
+
 def __authorize_fileaccess_registered_file__(request,
                                              infilename,
                                              accesstype):
-    """A registered file is a file that has been added to the SQL database and 
+    """A registered file is a file that has been added to the SQL database and
        is fully managed by the system. This function implements the authorization
        for these files.
-       
+
        :param request: The http request object used to determine the users name.
        :param infilename: Filename as given by DJANGO based on provided URL.
        :param accesstype: Define what type of operation the user needs to perform on the data.
                           See g_access_types.
-       
+
        :returns: The function returns two items:
            1) The path to the file identified as:
-              
+
               * None, in case that the file is not registered in the system.
               * String with the path of the file
               * HttpResponse with a redirect to login if needed or a response indicating that the access is forbidden.
-              
+
            2) The corresponding FileModelOmsi if it exists or None in case the file is not in the database
     """
-    
+
     global g_request_types
     global g_access_types
-    
+
     username = request.user.username
     authenticated = request.user.is_authenticated()
     #Strip the filename of any possible access indicators
     realfilename = infilename.lstrip(g_request_types['private']).lstrip(g_request_types['public'])
-    
+
     #Check if the file is in the database
     f = FileModelOmsi.objects.filter(path__endswith=realfilename)
     #If the file is not in the database return None to indicate that this is not a registered file
     if len(f) == 0:
         return None, None
-    
+
     #Check whether there is a public version of the file for view access
     if accesstype == g_access_types['view']:
         f2 = f.filter(is_public__exact=True)
@@ -641,7 +641,7 @@ def __authorize_fileaccess_registered_file__(request,
     #if infilename.startswith(g_request_types['public'])
     #    logger.warn("Public access to file not possible.")
     #    return HttpResponseForbidden("Public access to the file was not possible. You possibly indicated public: access when regular/private access rights are need. " )
-        
+
     #Check if the user is an authorized user of the file
     #Query whether the user is allowed to view, edit or own the file
     f3_view = f.filter(view_users__username__contains=username)
@@ -679,7 +679,7 @@ def __authorize_fileaccess_registered_file__(request,
         #The lamda functions used below generate the following basic type of query:
         #Q(auth_groups__name__contains=usergroups[0]) |
         #Q(auth_groups__name__contains=usergroups[1]) | ... |
-        #Q(auth_groups__name__contains=usergroups[-1]) 
+        #Q(auth_groups__name__contains=usergroups[-1])
         #which simply checks whether any of the groups of the user
         #defined in usergroups is part of the list of auth_groups
         try:
@@ -714,7 +714,7 @@ def __authorize_fileaccess_registered_file__(request,
         else:
             #Unknown access type, therefore we are being most restrictive
             f4 = f4_own
-        #The user is part of at least one of the groups authorized to perform the requested access to the file 
+        #The user is part of at least one of the groups authorized to perform the requested access to the file
         if len(f4) > 0:
             if authenticated:  # The user is logged in
                 return f4[0].path, f4[0]
@@ -726,8 +726,8 @@ def __authorize_fileaccess_registered_file__(request,
     # of the authorized groups
     logger.warn("Access to file denied.")
     return HttpResponseForbidden("Access to file denied."), None
-    
-      
+
+
 def __authorize_fileaccess_nonregistered_file__(request,
                                                 infilename,
                                                 accesstype,
@@ -735,36 +735,36 @@ def __authorize_fileaccess_nonregistered_file__(request,
     """An unregistered file is a file that exists on the storage system but the file
         has not yet been added to the SQL database. This function implements the authorization
        for these files.
-       
+
        :param request: The http request object used to determine the users name.
        :param infilename: Filename as given by DJANGO based on provided URL.
        :param accesstype: Define what type of operation the user needs to perform on the data.
                           See g_access_types.
        :param alternate_username: This parameter is used to check if a user different then the one \
                            specified in the request object is allowed to access the given file, \
-                           assuming that user is logged in. 
-       
-       :returns: 
-       
+                           assuming that user is logged in.
+
+       :returns:
+
             * String with the path of the file
             * HttpResponseForbidden if access is not allowed.
             * HttpResponseRedirect if login is  needed.
-            * HttpResonseNotFound if the file was not found. 
+            * HttpResonseNotFound if the file was not found.
     """
-    
+
     global g_request_types
     global g_access_types
-    
+
     request_type = g_request_types['unknown']
     username = request.user.username
     authenticated = request.user.is_authenticated()
     if alternate_username:
         username = alternate_username
-        authenticated = True 
+        authenticated = True
     realfilename = infilename
-    
+
     #Check if the file is indicated to be in a public data location
-    #Check if we have a private data request 
+    #Check if we have a private data request
     if realfilename.startswith(g_request_types['private']):
         request_type = g_request_types['private']
         realfilename = realfilename.lstrip(g_request_types['private'])
@@ -785,7 +785,7 @@ def __authorize_fileaccess_nonregistered_file__(request,
 
     #Create a list of files to be checked. We convert all paths to abosulte paths to ensure that we don't
     #have any hackers trying to access other files by adding ../ in the path
-    
+
     #Check whether the user has given us an absolute path that they are allowed to accessed
     fname = os.path.abspath(realfilename)
     if os.path.exists(fname):
@@ -796,10 +796,10 @@ def __authorize_fileaccess_nonregistered_file__(request,
         else:
             logger.warn("Access to file not granted.")
             return HttpResponseForbidden("Access to file not granted.")
-    
-    #If we do not have an aboslute path given, then we need to check the different possible locations for the file 
+
+    #If we do not have an aboslute path given, then we need to check the different possible locations for the file
     if not os.path.isabs(realfilename):
-        
+
         #Check all public locations if we have a public request
         if request_type == g_request_types['public']:  # Create list of public files
             for p in settings.ALLOWED_DATAPATHS:
@@ -813,16 +813,16 @@ def __authorize_fileaccess_nonregistered_file__(request,
                     else:
                         logger.warn("Access to file not granted.")
                         return HttpResponseForbidden("Access to file not granted.")
-                    
-        #If we have a private request and the user is not authenticated, then require the user to login    
+
+        #If we have a private request and the user is not authenticated, then require the user to login
         if request_type == g_request_types['private']:
             #Redirect the user to login page
             if not request.user.is_authenticated():
                 return redirect_to_login(request=request)
             #If the user is still not authenticated then return an error
-            if not request.user.is_authenticated(): 
+            if not request.user.is_authenticated():
                 return HttpResponseNotFound("File access not permitted.")
-         
+
             # If we have a private data request and the user si authenticated,
             # then check all possible private file locations
             if request.user.is_authenticated():
@@ -837,36 +837,36 @@ def __authorize_fileaccess_nonregistered_file__(request,
                         else:
                             logger.warn("Access to file not granted.")
                             return HttpResponseForbidden("Access to file not granted.")
-                    
+
     # We did not find a matching file. Return error.
     logger.warn("Requested file not found.")
     return HttpResponseNotFound("Requested file not found.")
-    
-    
+
+
 def __authorize_directory_access__(request,
                                    directory_path,
                                    request_type,
                                    accesstype):
     """Helper function for non-registered file access, ie., __authorize_fileaccess_nonregistered_file__,
        used to provide access to a particular directory path.
-       
+
        :param request: The http request object used to determine the users name.
        :param directory_path: The directory that should be accessed.
        :param request_type: The type of request as specified by g_request_types
        :param accesstype: Define what type of operation the user needs to perform on the data.
                           See g_access_types.
-       
+
     """
     global g_request_types
     global g_access_types
-    
+
     username = request.user.username
     authenticated = request.user.is_authenticated()
-    
+
     #Check whether we have a private access
     #In case of a private access we allow all accesses types to proceed
     if request_type == g_request_types['private']:
-        #Require the user to log in 
+        #Require the user to log in
         if not authenticated:  # If we have a private request and the user is not authenticated
             return redirect_to_login(request=request)
         authenticated = request.user.is_authenticated()
@@ -895,19 +895,13 @@ def __authorize_directory_access__(request,
 
 
 def redirect_to_login(request):
-    """Simple helper function to create the redirect to the login page with forwarding 
+    """Simple helper function to create the redirect to the login page with forwarding
     to the currently requested URL.
-    
+
        :param request: The current http request object.
-       
-       :returns: HttpResponseRedirect object with the redirect to the login page and the 
+
+       :returns: HttpResponseRedirect object with the redirect to the login page and the
                  next parameter set to the current full path.
-       
+
     """
     return HttpResponseRedirect(settings.LOGIN_URL+"?next="+request.get_full_path())
-
-    
-    
-    
-    
-

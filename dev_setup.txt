@@ -6,20 +6,37 @@ cd openmsi_web
 # install pyenv to make it easy to run multiple python versions:
 curl https://pyenv.run | bash
 
-# Restart your shell so the path changes take effect:
-exec $SHELL
+# put the startup pyenv commands into a shell script "initialize_pyenv.sh" and run them:
+source initialize_pyenv.sh
+
+```bash
+#!/bin/bash
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+```
 
 # install python version 2.7.18 (this will take several minutes....):
 pyenv install 2.7.18
+# installs to /Users/bpb/.pyenv/versions/2.7.18
 
-# there is a .python-version file within the openmsi_web git repo
-# that will automatically activate python v2.7.18
+pip install -r requirements.txt
 
-# install pipenv to manage virtual environments:
-pip install --user pipenv
 
-# install dependencies from Pipfile.lock
-pipenv install --deploy
+Your local dev settings needs to have a few things:
+webserver/omsi_server/omsi_server/local_settings.py
+
+This is how mine looks:
+
+```
+from host_profiles.client_dev import *
+from settings import *
+ALLOWED_DATAPATHS = ['/Users/bpb/Downloads','/Users/bpb/repos/openmsi_web']
+API_ROOT = "http://127.0.0.1:8000/"
+```
+
+These should probably go in a dev settings file that gets imported and not in local_settings.py
+
 
 # start the web server
-pipenv run python webserver/omsi_server/manage.py runserver
+python webserver/omsi_server/manage.py runserver

@@ -69,6 +69,9 @@ spec:
         - mountPath: /project/projectdirs/openmsi
           name: vol3
           readOnly: true
+        - mountPath: /global/cfs/cdirs/openmsi
+          name: vol4
+          readOnly: true
       dnsPolicy: ClusterFirst
       imagePullSecrets:
         - name: registry-nersc
@@ -93,5 +96,9 @@ spec:
           path: /global/cfs/cdirs/openmsi
           type: Directory
         name: vol3
+      - hostPath:
+          path: /global/cfs/cdirs/openmsi
+          type: Directory
+        name: vol4
 status: {}
 

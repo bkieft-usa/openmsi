@@ -10,7 +10,7 @@ RUN mkdir -p /data && \
     chmod 777 /data && \
     chmod 777 /backup
 
-ENV PREFIX openmsi_sqlite_
+ENV PREFIX=openmsi_sqlite_
 
 CMD /bin/sh -c ' \
    export TIMESTAMP=$(date +%Y%m%d%H%M) && \

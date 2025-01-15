@@ -5,7 +5,7 @@ RUN git clone https://github.com/biorack/BASTet
 
 FROM mambaorg/micromamba:0.7.13
 
-ENV PYTHONPATH /BASTet
+ENV PYTHONPATH=/BASTet
 
 RUN micromamba install -y -n base -c anaconda -c conda-forge -c bioconda \
         docutils=0.15.2 \
@@ -36,7 +36,7 @@ COPY ./omsi_server /src/omsi_server
 
 WORKDIR /src/omsi_server
 
-ENV STATIC_FILES /var/www/html/site_media/openmsi
+ENV STATIC_FILES=/var/www/html/site_media/openmsi
 
 RUN echo "from host_profiles.spin import *" > ./omsi_server/local_settings.py && \
     chmod -R a+rw /src/ && \

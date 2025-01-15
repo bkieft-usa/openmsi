@@ -16,6 +16,7 @@ ROOT_BACKUP_DIR="/global/cfs/cdirs/openmsi/omsi_db/backups/"
 OMSI_IMAGE=""
 BACKUP_IMAGE=""
 DEV=0
+# export NON_ROOT_UID='55710' #bpb uid at nersc
 export NON_ROOT_UID='97932'  # msdata user on NERSC
 export NON_ROOT_GID='60734'  # metatlas group on NERSC
 

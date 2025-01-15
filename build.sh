@@ -63,7 +63,7 @@ if [[ ! -r "${DOCKERFILE_DIR}/Dockerfile" ]]; then
   exit 1
 fi
 
-${DOCKER} image build --tag "${SHORT_TAG}" "${DOCKERFILE_DIR}"
+${DOCKER} buildx build --platform linux/amd64 --load --rm --compress --tag "${SHORT_TAG}" "${DOCKERFILE_DIR}"
 
 if [[ "$REGISTRY" != "NONE" ]]; then
   DOCKER_RESOLVED="$(basename $(readlink -f $(which ${DOCKER})))"

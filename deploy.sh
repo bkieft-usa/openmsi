@@ -11,14 +11,17 @@ FLAGS="--namespace=${NAMESPACE}"
 
 # location of backup directories on global file system (cori)
 ROOT_BACKUP_DIR="/global/cfs/cdirs/openmsi/omsi_db/backups/"
+BACKUP_PREFIX="openmsi_sqlite_"
 
 # initialize variables to avoid errors
 OMSI_IMAGE=""
 BACKUP_IMAGE=""
 DEV=0
-# export NON_ROOT_UID='55710' #bpb uid at nersc
+#export NON_ROOT_UID='104741' #bkieft uid at nersc
+#export NON_ROOT_UID='55710' #bpb uid at nersc
 export NON_ROOT_UID='97932'  # msdata user on NERSC
-export NON_ROOT_GID='60734'  # metatlas group on NERSC
+#export NON_ROOT_GID='60734'  # metatlas group on NERSC
+export NON_ROOT_GID='55809'  # openmsi group on NERSC
 
 # mount points of the persistant volumes
 BACKUP_MNT=/backups
@@ -48,7 +51,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 function k8s_version() {
-  rancher kubectl version --short=true \
+  rancher kubectl version \
   | grep '^Server Version:' \
   | tr -d ' v'  \
   | cut -d: -f2
@@ -157,10 +160,10 @@ DEPLOY_TMP="${SCRIPT_DIR}/deploy_tmp"
 mkdir -p "$DEPLOY_TMP"
 rm -rf "$DEPLOY_TMP/*"
 
-if declare -F module; then
-  module unload spin/1.0 &> /dev/null || true
-  module load "${SPIN_MODULE}"
-fi
+#if declare -F module; then
+#  module unload spin/1.0 &> /dev/null || true
+#  module load "${SPIN_MODULE}"
+#fi
 
 if ! which rancher; then
   >&2 echo "ERROR: Required program 'rancher' not found."

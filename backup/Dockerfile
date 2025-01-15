@@ -1,4 +1,5 @@
-FROM debian:buster-slim
+# FROM debian:buster-slim
+FROM ubuntu:20.04
 
 RUN apt-get update && apt-get install -y \
     sqlite3 \

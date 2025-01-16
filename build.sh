@@ -3,7 +3,7 @@
 # catch some common errors, terminate if a command returns non-zero exit code
 set -euf -o pipefail
 
-SPIN_USER="msdata"
+SPIN_USER="$USER"
 PROJECT="m2650/openmsi"
 REGISTRY="registry.nersc.gov"
 DOCKER="docker"

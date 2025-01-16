@@ -17,9 +17,9 @@ BACKUP_PREFIX="openmsi_sqlite_"
 OMSI_IMAGE=""
 BACKUP_IMAGE=""
 DEV=0
-#export NON_ROOT_UID='104741' #bkieft uid at nersc
+export NON_ROOT_UID='104741' #bkieft uid at nersc
 #export NON_ROOT_UID='55710' #bpb uid at nersc
-export NON_ROOT_UID='97932'  # msdata user on NERSC
+#export NON_ROOT_UID='97932'  # msdata user on NERSC
 #export NON_ROOT_GID='60734'  # metatlas group on NERSC
 export NON_ROOT_GID='55809'  # openmsi group on NERSC
 

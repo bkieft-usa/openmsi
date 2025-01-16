@@ -17,11 +17,11 @@ BACKUP_PREFIX="openmsi_sqlite_"
 OMSI_IMAGE=""
 BACKUP_IMAGE=""
 DEV=0
-export NON_ROOT_UID='104741' #bkieft uid at nersc
+#export NON_ROOT_UID='104741' #bkieft uid at nersc
 #export NON_ROOT_UID='55710' #bpb uid at nersc
-#export NON_ROOT_UID='97932'  # msdata user on NERSC
-export NON_ROOT_GID='60734'  # metatlas group on NERSC
-#export NON_ROOT_GID='55809'  # openmsi group on NERSC
+export NON_ROOT_UID='97932'  # msdata user on NERSC
+#export NON_ROOT_GID='60734'  # metatlas group on NERSC
+export NON_ROOT_GID='55809'  # openmsi group on NERSC
 
 # mount points of the persistant volumes
 BACKUP_MNT=/backups
@@ -222,10 +222,11 @@ rancher kubectl apply $FLAGS -f "${DEPLOY_TMP}/restore.yaml"
 rancher kubectl apply $FLAGS -f "${DEPLOY_TMP}/restore-root.yaml"
 
 ## Restore openmsi database
+echo "Restoring openmsi database at ${DB_BACKUP_INTERNAL} to ${DB_MNT}/openmsi.sqlite with restore pod"
 rancher kubectl wait $FLAGS deployment.apps/restore --for=condition=available --timeout=60s
 rancher kubectl exec deployment.apps/restore $FLAGS -- /bin/bash -c "gunzip -c ${DB_BACKUP_INTERNAL} > ${DB_MNT}/openmsi.sqlite"
 rancher kubectl scale $FLAGS --replicas=0 deployment.app/restore
-
+echo "Changing permissions of database to ${NON_ROOT_UID}:${NON_ROOT_GID} with restore-root pod"
 rancher kubectl wait $FLAGS deployment.apps/restore-root --for=condition=available --timeout=60s
 rancher kubectl exec deployment.apps/restore-root $FLAGS -- chown "${NON_ROOT_UID}:${NON_ROOT_GID}" "${DB_MNT}/openmsi.sqlite"
 rancher kubectl scale $FLAGS --replicas=0 deployment.app/restore-root

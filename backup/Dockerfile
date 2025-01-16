@@ -1,10 +1,16 @@
 FROM debian:buster-slim
 #FROM ubuntu:20.04
 
-RUN apt-get update && apt-get install -y \
+USER root
+
+RUN rm -r /var/lib/apt/lists/ && \
+    mkdir -p /var/lib/apt/lists/partial && \
+    apt-get update && apt-get install -y \
     sqlite3 \
     gzip \
     && rm -rf /var/lib/{apt,dpkg,cache,log}
+
+USER 97932
 
 RUN mkdir -p /data && \
     mkdir -p /backup && \

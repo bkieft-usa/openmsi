@@ -4,7 +4,7 @@
 set -euf -o pipefail
 
 #SPIN_USER="$USER"
-SPIN_USER="msdata"
+SPIN_USER="bkieft"
 PROJECT="m2650/openmsi"
 REGISTRY="registry.nersc.gov"
 DOCKER="docker"
